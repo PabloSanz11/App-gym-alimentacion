@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.pablosanz.gymapp.R;
 import com.pablosanz.gymapp.data.api.FoodProduct;
 import com.pablosanz.gymapp.data.api.FoodSearchResponse;
 import com.pablosanz.gymapp.data.model.FavoriteFood;
