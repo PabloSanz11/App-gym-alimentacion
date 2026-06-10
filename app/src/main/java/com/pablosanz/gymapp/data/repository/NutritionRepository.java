@@ -67,20 +67,24 @@ public class NutritionRepository {
 
     public void searchFood(String query, OnFoodSearchCallback callback) {
         RetrofitClient.getInstance().getService()
-                .searchFood(query, 1, 20)
+                .searchFood("process", query, 1, 20, "product_name,brands,nutriments,code")
                 .enqueue(new Callback<FoodSearchResponse>() {
                     @Override
                     public void onResponse(Call<FoodSearchResponse> call, Response<FoodSearchResponse> response) {
-                        if (response.isSuccessful() && response.body() != null) {
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().getProducts() != null) {
+                            callback.onSuccess(response.body());
+                        } else if (response.isSuccessful() && response.body() != null) {
+                            // Empty but valid response
                             callback.onSuccess(response.body());
                         } else {
-                            callback.onError("Error en la respuesta");
+                            callback.onError("Sin resultados (código " + response.code() + ")");
                         }
                     }
 
                     @Override
                     public void onFailure(Call<FoodSearchResponse> call, Throwable t) {
-                        callback.onError(t.getMessage());
+                        callback.onError(t.getMessage() != null ? t.getMessage() : "Sin conexión");
                     }
                 });
     }

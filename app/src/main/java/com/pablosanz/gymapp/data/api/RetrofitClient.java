@@ -1,5 +1,7 @@
 package com.pablosanz.gymapp.data.api;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -21,10 +23,15 @@ public class RetrofitClient {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
 
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .serializeNulls()
+                .create();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
         service = retrofit.create(OpenFoodFactsService.class);
     }
