@@ -10,8 +10,12 @@ import com.pablosanz.gymapp.data.db.AppDatabase;
 import com.pablosanz.gymapp.data.db.FavoriteFoodDao;
 import com.pablosanz.gymapp.data.db.FoodEntryDao;
 import com.pablosanz.gymapp.data.db.MealLogDao;
+import com.pablosanz.gymapp.data.db.RecipeDao;
+import com.pablosanz.gymapp.data.db.RecipeIngredientDao;
 import com.pablosanz.gymapp.data.model.FoodEntry;
 import com.pablosanz.gymapp.data.model.MealLog;
+import com.pablosanz.gymapp.data.model.Recipe;
+import com.pablosanz.gymapp.data.model.RecipeIngredient;
 
 import java.util.List;
 
@@ -24,12 +28,16 @@ public class NutritionRepository {
     private final MealLogDao mealLogDao;
     private final FoodEntryDao foodEntryDao;
     private final FavoriteFoodDao favoriteFoodDao;
+    private final RecipeDao recipeDao;
+    private final RecipeIngredientDao recipeIngredientDao;
 
     public NutritionRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
         mealLogDao = db.mealLogDao();
         foodEntryDao = db.foodEntryDao();
         favoriteFoodDao = db.favoriteFoodDao();
+        recipeDao = db.recipeDao();
+        recipeIngredientDao = db.recipeIngredientDao();
     }
 
     public LiveData<List<MealLog>> getMealLogsByDate(String date) {
@@ -67,7 +75,7 @@ public class NutritionRepository {
 
     public void searchFood(String query, OnFoodSearchCallback callback) {
         RetrofitClient.getInstance().getService()
-                .searchFood("process", query, 1, 20, "product_name,brands,nutriments,code")
+                .searchFood("process", query, 1, 20, "product_name,brands,nutriments,code", "es", "mx")
                 .enqueue(new Callback<FoodSearchResponse>() {
                     @Override
                     public void onResponse(Call<FoodSearchResponse> call, Response<FoodSearchResponse> response) {
@@ -118,6 +126,37 @@ public class NutritionRepository {
 
     public interface OnWeeklySummaryCallback {
         void onResult(java.util.List<com.pablosanz.gymapp.data.model.MealLog> logs);
+    }
+
+    public void searchRecipes(String query, OnRecipesCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Recipe> recipes = query.isEmpty()
+                    ? recipeDao.getAll()
+                    : recipeDao.search(query);
+            if (callback != null) callback.onResult(recipes);
+        });
+    }
+
+    public void getRecipesByCategory(String category, OnRecipesCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Recipe> recipes = recipeDao.getByCategory(category);
+            if (callback != null) callback.onResult(recipes);
+        });
+    }
+
+    public void getRecipeIngredients(long recipeId, OnIngredientsCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<RecipeIngredient> ingredients = recipeIngredientDao.getByRecipeId(recipeId);
+            if (callback != null) callback.onResult(ingredients);
+        });
+    }
+
+    public interface OnRecipesCallback {
+        void onResult(List<Recipe> recipes);
+    }
+
+    public interface OnIngredientsCallback {
+        void onResult(List<RecipeIngredient> ingredients);
     }
 
     public void getFavoriteFoods(OnFavoriteFoodsCallback callback) {

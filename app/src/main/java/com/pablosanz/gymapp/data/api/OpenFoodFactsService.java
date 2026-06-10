@@ -13,7 +13,9 @@ public interface OpenFoodFactsService {
             @Query("search_terms") String query,
             @Query("json") int json,
             @Query("page_size") int pageSize,
-            @Query("fields") String fields);
+            @Query("fields") String fields,
+            @Query("lc") String languageCode,
+            @Query("cc") String countryCode);
 
     @GET("api/v0/product/{barcode}.json")
     Call<ProductResponse> getProduct(@Path("barcode") String barcode);

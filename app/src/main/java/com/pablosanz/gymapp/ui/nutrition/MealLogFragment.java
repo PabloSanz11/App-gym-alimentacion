@@ -72,6 +72,14 @@ public class MealLogFragment extends Fragment {
         binding.rvFoodResults.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvFoodResults.setAdapter(adapter);
 
+        binding.btnBrowseRecipes.setOnClickListener(v -> {
+            Bundle recipeArgs = new Bundle();
+            recipeArgs.putString("mealSlot", mealSlot);
+            recipeArgs.putString("date", date);
+            Navigation.findNavController(v)
+                    .navigate(R.id.action_mealLogFragment_to_recipeListFragment, recipeArgs);
+        });
+
         // Favorite / frequent foods
         binding.rvFavorites.setLayoutManager(
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
