@@ -19,4 +19,5 @@
     <color name="black">#000000</color>
     <color name="gray_light">#EEEEEE</color>
     <color name="text_secondary">#757575</color>
+    <color name="ic_launcher_background">#2E7D32</color>
 </resources>
