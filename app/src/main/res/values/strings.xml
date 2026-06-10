@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GymFit Pro</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_gym">Gym</string>
+    <string name="nav_nutrition">Nutrición</string>
+    <string name="nav_shopping">Compras</string>
+
+    <!-- Gym Fragment -->
+    <string name="gym_today_title">Entrenamiento de Hoy</string>
+    <string name="gym_start_session">Iniciar Sesión</string>
+    <string name="gym_last_measurement">Última Medición</string>
+    <string name="gym_body_weight">Peso Corporal</string>
+    <string name="gym_view_progress">Ver Progreso</string>
+    <string name="gym_no_exercises">Sin ejercicios</string>
+
+    <!-- Workout Log Fragment -->
+    <string name="workout_log_title">Registro de Entrenamiento</string>
+    <string name="workout_save_session">Guardar Sesión</string>
+    <string name="workout_reps_hint">Reps</string>
+    <string name="workout_weight_hint">Peso (kg)</string>
+    <string name="workout_session_saved">Sesión guardada correctamente</string>
+
+    <!-- Progress Fragment -->
+    <string name="progress_title">Progreso Corporal</string>
+    <string name="progress_weight_chart">Gráfica de Peso</string>
+    <string name="progress_add_measurement">Agregar Medición</string>
+    <string name="progress_weight_hint">Peso (kg)</string>
+    <string name="progress_waist_hint">Cintura (cm)</string>
+    <string name="progress_save_measurement">Guardar Medición</string>
+    <string name="progress_recent_measurements">Mediciones Recientes</string>
+    <string name="progress_no_data">Sin datos de peso aún</string>
+
+    <!-- Nutrition Fragment -->
+    <string name="nutrition_title">Nutrición</string>
+    <string name="nutrition_desayuno">Desayuno</string>
+    <string name="nutrition_almuerzo">Almuerzo</string>
+    <string name="nutrition_merienda">Merienda</string>
+    <string name="nutrition_cena">Cena</string>
+    <string name="nutrition_time_desayuno">9:00 AM</string>
+    <string name="nutrition_time_almuerzo">12:00 PM</string>
+    <string name="nutrition_time_merienda">4:00 PM</string>
+    <string name="nutrition_time_cena">8:00 PM</string>
+    <string name="nutrition_add_food">+</string>
+    <string name="nutrition_daily_summary">Resumen del Día</string>
+    <string name="nutrition_calories">Calorías</string>
+    <string name="nutrition_protein">Proteína</string>
+    <string name="nutrition_carbs">Carbohidratos</string>
+    <string name="nutrition_fat">Grasas</string>
+    <string name="nutrition_no_records">Sin registros</string>
+    <string name="nutrition_goal_calories">Meta: 2500 kcal</string>
+    <string name="nutrition_goal_protein">Meta: 170g</string>
+
+    <!-- Meal Log Fragment -->
+    <string name="meal_log_title">Agregar Alimento</string>
+    <string name="meal_search_hint">Buscar alimento…</string>
+    <string name="meal_quantity_hint">Cantidad (g)</string>
+    <string name="meal_save_button">Agregar a comida</string>
+    <string name="meal_food_added">Alimento agregado</string>
+    <string name="meal_search_error">Error al buscar alimentos</string>
+
+    <!-- Shopping Fragment -->
+    <string name="shopping_placeholder">Próximamente: Lista de compras semanal con precios de Walmart México</string>
+    <string name="shopping_title">Lista de Compras</string>
+
+    <!-- Common -->
+    <string name="btn_prev">‹</string>
+    <string name="btn_next">›</string>
+    <string name="loading">Cargando…</string>
+    <string name="error_empty_field">Este campo es requerido</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="select">Seleccionar</string>
+</resources>

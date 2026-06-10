@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/gymFragment">
+
+    <fragment
+        android:id="@+id/gymFragment"
+        android:name="com.pablosanz.gymapp.ui.gym.GymFragment"
+        android:label="@string/nav_gym"
+        tools:layout="@layout/fragment_gym">
+        <action
+            android:id="@+id/action_gymFragment_to_workoutLogFragment"
+            app:destination="@id/workoutLogFragment" />
+        <action
+            android:id="@+id/action_gymFragment_to_progressFragment"
+            app:destination="@id/progressFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/workoutLogFragment"
+        android:name="com.pablosanz.gymapp.ui.gym.WorkoutLogFragment"
+        android:label="@string/workout_log_title"
+        tools:layout="@layout/fragment_workout_log">
+        <argument
+            android:name="dayType"
+            app:argType="integer"
+            android:defaultValue="1" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/progressFragment"
+        android:name="com.pablosanz.gymapp.ui.gym.ProgressFragment"
+        android:label="@string/progress_title"
+        tools:layout="@layout/fragment_progress" />
+
+    <fragment
+        android:id="@+id/nutritionFragment"
+        android:name="com.pablosanz.gymapp.ui.nutrition.NutritionFragment"
+        android:label="@string/nav_nutrition"
+        tools:layout="@layout/fragment_nutrition">
+        <action
+            android:id="@+id/action_nutritionFragment_to_mealLogFragment"
+            app:destination="@id/mealLogFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/mealLogFragment"
+        android:name="com.pablosanz.gymapp.ui.nutrition.MealLogFragment"
+        android:label="@string/meal_log_title"
+        tools:layout="@layout/fragment_meal_log">
+        <argument
+            android:name="mealSlot"
+            app:argType="string"
+            android:defaultValue="desayuno" />
+        <argument
+            android:name="date"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/shoppingFragment"
+        android:name="com.pablosanz.gymapp.ui.shopping.ShoppingFragment"
+        android:label="@string/nav_shopping"
+        tools:layout="@layout/fragment_shopping" />
+
+</navigation>
