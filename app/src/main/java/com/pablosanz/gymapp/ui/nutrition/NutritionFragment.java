@@ -48,6 +48,7 @@ public class NutritionFragment extends Fragment {
         updateDateDisplay();
         loadMealData();
         setupClickListeners();
+        loadWeeklySummary();
     }
 
     private void updateDateDisplay() {
@@ -144,6 +145,31 @@ public class NutritionFragment extends Fragment {
                 log.getTotalProteinG(),
                 log.getTotalCarbsG(),
                 log.getTotalFatG());
+    }
+
+    private void loadWeeklySummary() {
+        nutritionRepository.getWeeklySummary(logs -> {
+            // Group calories by date
+            java.util.Map<String, Float> caloriesByDate = new java.util.LinkedHashMap<>();
+            for (MealLog log : logs) {
+                caloriesByDate.merge(log.getDate(), log.getTotalCaloriesKcal(), Float::sum);
+            }
+            StringBuilder sb = new StringBuilder();
+            if (caloriesByDate.isEmpty()) {
+                sb.append("Sin datos esta semana");
+            } else {
+                for (java.util.Map.Entry<String, Float> entry : caloriesByDate.entrySet()) {
+                    sb.append(DateUtils.formatForDisplay(entry.getKey()))
+                      .append(": ")
+                      .append(String.format("%.0f kcal", entry.getValue()))
+                      .append("\n");
+                }
+            }
+            String text = sb.toString().trim();
+            requireActivity().runOnUiThread(() -> {
+                if (binding != null) binding.tvWeeklySummary.setText(text);
+            });
+        });
     }
 
     @Override

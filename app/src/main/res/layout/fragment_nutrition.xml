@@ -4,75 +4,120 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground">
+    android:background="#F2F2F7">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <!-- Date Navigation Header -->
+        <!-- Hero header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_prev_day"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="@string/btn_prev"
-                android:textSize="18sp"
-                app:backgroundTint="@color/colorPrimary"
-                android:textColor="@color/white"
-                style="@style/Widget.Material3.Button.IconButton.Filled"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:paddingStart="0dp"
-                android:paddingEnd="0dp" />
+            android:background="@color/colorPrimary"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="24dp">
 
             <TextView
-                android:id="@+id/tv_current_date"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/colorOnBackground" />
+                android:text="GymFit Pro"
+                android:textColor="#FFFFFF"
+                android:alpha="0.7"
+                android:textSize="13sp"
+                android:letterSpacing="0.12"
+                android:textAllCaps="true" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_next_day"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="@string/btn_next"
-                android:textSize="18sp"
-                app:backgroundTint="@color/colorPrimary"
-                android:textColor="@color/white"
-                style="@style/Widget.Material3.Button.IconButton.Filled"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:paddingStart="0dp"
-                android:paddingEnd="0dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nutrición"
+                android:textColor="#FFFFFF"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:layout_marginTop="2dp" />
 
         </LinearLayout>
+
+        <!-- Date Navigation -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_prev_day"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:text="@string/btn_prev"
+                    android:textSize="18sp"
+                    app:backgroundTint="@color/colorPrimary"
+                    android:textColor="@color/white"
+                    style="@style/Widget.Material3.Button.IconButton.Filled"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp" />
+
+                <TextView
+                    android:id="@+id/tv_current_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="#1C1C1E" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_next_day"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:text="@string/btn_next"
+                    android:textSize="18sp"
+                    app:backgroundTint="@color/colorPrimary"
+                    android:textColor="@color/white"
+                    style="@style/Widget.Material3.Button.IconButton.Filled"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Desayuno Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="12dp"
+                android:padding="16dp"
                 android:gravity="center_vertical">
 
                 <LinearLayout
@@ -85,24 +130,26 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/nutrition_desayuno"
-                        android:textSize="14sp"
+                        android:textSize="15sp"
                         android:textStyle="bold"
-                        android:textColor="@color/colorPrimary" />
+                        android:textColor="#1C1C1E" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/nutrition_time_desayuno"
-                        android:textSize="11sp"
-                        android:textColor="@color/text_secondary" />
+                        android:textSize="12sp"
+                        android:textColor="#6C6C70"
+                        android:layout_marginTop="2dp" />
 
                     <TextView
                         android:id="@+id/tv_desayuno_macros"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/nutrition_no_records"
-                        android:textSize="12sp"
-                        android:textColor="@color/colorOnSurface" />
+                        android:textSize="13sp"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_marginTop="4dp" />
 
                 </LinearLayout>
 
@@ -127,15 +174,18 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="12dp"
+                android:padding="16dp"
                 android:gravity="center_vertical">
 
                 <LinearLayout
@@ -148,24 +198,26 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/nutrition_almuerzo"
-                        android:textSize="14sp"
+                        android:textSize="15sp"
                         android:textStyle="bold"
-                        android:textColor="@color/colorPrimary" />
+                        android:textColor="#1C1C1E" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/nutrition_time_almuerzo"
-                        android:textSize="11sp"
-                        android:textColor="@color/text_secondary" />
+                        android:textSize="12sp"
+                        android:textColor="#6C6C70"
+                        android:layout_marginTop="2dp" />
 
                     <TextView
                         android:id="@+id/tv_almuerzo_macros"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/nutrition_no_records"
-                        android:textSize="12sp"
-                        android:textColor="@color/colorOnSurface" />
+                        android:textSize="13sp"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_marginTop="4dp" />
 
                 </LinearLayout>
 
@@ -190,15 +242,18 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="12dp"
+                android:padding="16dp"
                 android:gravity="center_vertical">
 
                 <LinearLayout
@@ -211,24 +266,26 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/nutrition_merienda"
-                        android:textSize="14sp"
+                        android:textSize="15sp"
                         android:textStyle="bold"
-                        android:textColor="@color/colorPrimary" />
+                        android:textColor="#1C1C1E" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/nutrition_time_merienda"
-                        android:textSize="11sp"
-                        android:textColor="@color/text_secondary" />
+                        android:textSize="12sp"
+                        android:textColor="#6C6C70"
+                        android:layout_marginTop="2dp" />
 
                     <TextView
                         android:id="@+id/tv_merienda_macros"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/nutrition_no_records"
-                        android:textSize="12sp"
-                        android:textColor="@color/colorOnSurface" />
+                        android:textSize="13sp"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_marginTop="4dp" />
 
                 </LinearLayout>
 
@@ -253,15 +310,18 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
-            android:layout_marginBottom="16dp">
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="12dp"
+                android:padding="16dp"
                 android:gravity="center_vertical">
 
                 <LinearLayout
@@ -274,24 +334,26 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/nutrition_cena"
-                        android:textSize="14sp"
+                        android:textSize="15sp"
                         android:textStyle="bold"
-                        android:textColor="@color/colorPrimary" />
+                        android:textColor="#1C1C1E" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/nutrition_time_cena"
-                        android:textSize="11sp"
-                        android:textColor="@color/text_secondary" />
+                        android:textSize="12sp"
+                        android:textColor="#6C6C70"
+                        android:layout_marginTop="2dp" />
 
                     <TextView
                         android:id="@+id/tv_cena_macros"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/nutrition_no_records"
-                        android:textSize="12sp"
-                        android:textColor="@color/colorOnSurface" />
+                        android:textSize="13sp"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_marginTop="4dp" />
 
                 </LinearLayout>
 
@@ -316,23 +378,27 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/nutrition_daily_summary"
-                    android:textSize="16sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_marginBottom="12dp" />
+                    android:textColor="#1C1C1E"
+                    android:layout_marginBottom="14dp" />
 
                 <!-- Calories -->
                 <LinearLayout
@@ -347,7 +413,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/nutrition_calories"
-                        android:textSize="13sp" />
+                        android:textSize="13sp"
+                        android:textColor="#3C3C43" />
 
                     <TextView
                         android:id="@+id/tv_total_calories"
@@ -355,7 +422,8 @@
                         android:layout_height="wrap_content"
                         android:text="0 / 2500 kcal"
                         android:textSize="13sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="#1C1C1E" />
 
                 </LinearLayout>
 
@@ -365,7 +433,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="8dp"
                     android:progressTint="@color/colorAccent"
-                    android:layout_marginBottom="10dp" />
+                    android:layout_marginBottom="12dp" />
 
                 <!-- Protein -->
                 <LinearLayout
@@ -380,7 +448,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/nutrition_protein"
-                        android:textSize="13sp" />
+                        android:textSize="13sp"
+                        android:textColor="#3C3C43" />
 
                     <TextView
                         android:id="@+id/tv_total_protein"
@@ -388,7 +457,8 @@
                         android:layout_height="wrap_content"
                         android:text="0g / 170g"
                         android:textSize="13sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="#1C1C1E" />
 
                 </LinearLayout>
 
@@ -398,7 +468,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="8dp"
                     android:progressTint="@color/colorPrimary"
-                    android:layout_marginBottom="10dp" />
+                    android:layout_marginBottom="12dp" />
 
                 <!-- Carbs -->
                 <LinearLayout
@@ -413,7 +483,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/nutrition_carbs"
-                        android:textSize="13sp" />
+                        android:textSize="13sp"
+                        android:textColor="#3C3C43" />
 
                     <TextView
                         android:id="@+id/tv_total_carbs"
@@ -421,7 +492,8 @@
                         android:layout_height="wrap_content"
                         android:text="0g / 280g"
                         android:textSize="13sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="#1C1C1E" />
 
                 </LinearLayout>
 
@@ -431,7 +503,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="8dp"
                     android:progressTint="@color/colorGreenLight"
-                    android:layout_marginBottom="10dp" />
+                    android:layout_marginBottom="12dp" />
 
                 <!-- Fat -->
                 <LinearLayout
@@ -446,7 +518,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/nutrition_fat"
-                        android:textSize="13sp" />
+                        android:textSize="13sp"
+                        android:textColor="#3C3C43" />
 
                     <TextView
                         android:id="@+id/tv_total_fat"
@@ -454,7 +527,8 @@
                         android:layout_height="wrap_content"
                         android:text="0g / 80g"
                         android:textSize="13sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="#1C1C1E" />
 
                 </LinearLayout>
 
@@ -465,6 +539,40 @@
                     android:layout_height="8dp"
                     android:progressTint="@color/colorOrangeLight" />
 
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Weekly Summary Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="24dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Resumen Semanal"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="#1C1C1E"
+                    android:layout_marginBottom="8dp"/>
+                <TextView
+                    android:id="@+id/tv_weekly_summary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Cargando resumen..."
+                    android:textSize="13sp"
+                    android:textColor="#6C6C70"
+                    android:lineSpacingExtra="4dp"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

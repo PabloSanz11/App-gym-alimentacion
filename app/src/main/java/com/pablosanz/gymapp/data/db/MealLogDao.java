@@ -28,4 +28,7 @@ public interface MealLogDao {
 
     @Query("SELECT * FROM meal_logs WHERE date = :date AND mealSlot = :mealSlot LIMIT 1")
     MealLog getByDateAndSlot(String date, String mealSlot);
+
+    @Query("SELECT * FROM meal_logs WHERE date IN (:dates) ORDER BY date DESC")
+    List<MealLog> getByDateRange(List<String> dates);
 }

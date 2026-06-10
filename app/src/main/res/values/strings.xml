@@ -9,7 +9,7 @@
 
     <!-- Gym Fragment -->
     <string name="gym_today_title">Entrenamiento de Hoy</string>
-    <string name="gym_start_session">Iniciar Sesión</string>
+    <string name="gym_start_session">Iniciar Entrenamiento</string>
     <string name="gym_last_measurement">Última Medición</string>
     <string name="gym_body_weight">Peso Corporal</string>
     <string name="gym_view_progress">Ver Progreso</string>

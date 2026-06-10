@@ -5,18 +5,16 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.pablosanz.gymapp.R;
 import com.pablosanz.gymapp.data.model.Exercise;
 import com.pablosanz.gymapp.databinding.ItemExerciseSetBinding;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ExerciseSetAdapter extends RecyclerView.Adapter<ExerciseSetAdapter.ViewHolder> {
 
@@ -37,8 +35,10 @@ public class ExerciseSetAdapter extends RecyclerView.Adapter<ExerciseSetAdapter.
     }
 
     private final List<ExerciseSetData> items;
+    private final Map<String, Float> lastWeights;
 
-    public ExerciseSetAdapter(List<Exercise> exercises) {
+    public ExerciseSetAdapter(List<Exercise> exercises, Map<String, Float> lastWeights) {
+        this.lastWeights = lastWeights;
         this.items = new ArrayList<>();
         for (Exercise exercise : exercises) {
             for (int i = 1; i <= exercise.getSetsTarget(); i++) {
@@ -58,7 +58,7 @@ public class ExerciseSetAdapter extends RecyclerView.Adapter<ExerciseSetAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ExerciseSetData data = items.get(position);
-        holder.bind(data);
+        holder.bind(data, lastWeights);
     }
 
     @Override
@@ -78,13 +78,21 @@ public class ExerciseSetAdapter extends RecyclerView.Adapter<ExerciseSetAdapter.
             this.binding = binding;
         }
 
-        void bind(ExerciseSetData data) {
+        void bind(ExerciseSetData data, Map<String, Float> lastWeights) {
             binding.tvExerciseName.setText(data.exercise.getName());
             binding.tvSetNumber.setText("Serie " + data.setNumber + "/" + data.exercise.getSetsTarget());
             binding.tvTargetReps.setText("Meta: " + data.exercise.getRepsTarget() + " reps");
 
             binding.etReps.setText(data.reps > 0 ? String.valueOf(data.reps) : "");
             binding.etWeight.setText(data.weightKg > 0 ? String.valueOf(data.weightKg) : "");
+
+            // Show previous weight as hint
+            if (lastWeights != null && lastWeights.containsKey(data.exercise.getName())) {
+                float prev = lastWeights.get(data.exercise.getName());
+                binding.etWeight.setHint(String.format("Anterior: %.1f kg", prev));
+            } else {
+                binding.etWeight.setHint("kg");
+            }
 
             binding.etReps.addTextChangedListener(new SimpleTextWatcher() {
                 @Override

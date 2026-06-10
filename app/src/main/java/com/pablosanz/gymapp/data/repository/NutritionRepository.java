@@ -94,4 +94,22 @@ public class NutritionRepository {
         void onSuccess(FoodSearchResponse response);
         void onError(String error);
     }
+
+    public void getWeeklySummary(OnWeeklySummaryCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            // Get meal logs for last 7 days
+            java.util.List<String> dates = new java.util.ArrayList<>();
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            for (int i = 0; i < 7; i++) {
+                dates.add(com.pablosanz.gymapp.util.DateUtils.formatDate(cal.getTime()));
+                cal.add(java.util.Calendar.DAY_OF_YEAR, -1);
+            }
+            java.util.List<com.pablosanz.gymapp.data.model.MealLog> logs = mealLogDao.getByDateRange(dates);
+            if (callback != null) callback.onResult(logs);
+        });
+    }
+
+    public interface OnWeeklySummaryCallback {
+        void onResult(java.util.List<com.pablosanz.gymapp.data.model.MealLog> logs);
+    }
 }
