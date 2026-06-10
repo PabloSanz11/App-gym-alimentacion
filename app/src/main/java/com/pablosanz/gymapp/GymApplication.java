@@ -8,6 +8,16 @@ public class GymApplication extends Application implements Configuration.Provide
     @Override
     public void onCreate() {
         super.onCreate();
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            android.util.Log.e("GymApp_CRASH", "FATAL: " + throwable.getMessage(), throwable);
+            // Persist crash message for user to share
+            try {
+                android.content.SharedPreferences prefs = getSharedPreferences("crash_log", MODE_PRIVATE);
+                prefs.edit().putString("last_crash", throwable.toString() + " | " + throwable.getMessage()).apply();
+            } catch (Exception ignored) {}
+            android.os.Process.killProcess(android.os.Process.myPid());
+            System.exit(1);
+        });
     }
 
     @Override

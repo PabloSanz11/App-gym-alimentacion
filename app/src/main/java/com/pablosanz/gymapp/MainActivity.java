@@ -41,6 +41,14 @@ public class MainActivity extends AppCompatActivity {
             NavigationUI.setupWithNavController(binding.bottomNavigation, navController);
         }
 
+        // Show previous crash info for debugging
+        android.content.SharedPreferences prefs = getSharedPreferences("crash_log", MODE_PRIVATE);
+        String lastCrash = prefs.getString("last_crash", null);
+        if (lastCrash != null) {
+            android.widget.Toast.makeText(this, "Crash anterior: " + lastCrash.substring(0, Math.min(100, lastCrash.length())), android.widget.Toast.LENGTH_LONG).show();
+            prefs.edit().remove("last_crash").apply();
+        }
+
         // Request notification permission on Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -50,8 +58,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Create notification channels and schedule meal reminders
-        NotificationHelper.createNotificationChannels(this);
-        NotificationHelper.scheduleAllMealReminders(this);
+        try {
+            NotificationHelper.createNotificationChannels(this);
+            NotificationHelper.scheduleAllMealReminders(this);
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "Notification setup failed", e);
+        }
     }
 
     @Override
