@@ -24,7 +24,6 @@ public class GymApplication extends Application implements Configuration.Provide
         }
 
         // Capture crashes to show on next launch
-        final Thread.UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
             android.util.Log.e("GymApp_CRASH", "FATAL: " + throwable.getMessage(), throwable);
             try {
@@ -33,7 +32,8 @@ public class GymApplication extends Application implements Configuration.Provide
                 getSharedPreferences("crash_log", MODE_PRIVATE)
                         .edit().putString("last_crash", sw.toString()).apply();
             } catch (Exception ignored) {}
-            if (defaultHandler != null) defaultHandler.uncaughtException(thread, throwable);
+            // Must kill process so Android shows crash dialog and app restarts cleanly
+            android.os.Process.killProcess(android.os.Process.myPid());
         });
     }
 
