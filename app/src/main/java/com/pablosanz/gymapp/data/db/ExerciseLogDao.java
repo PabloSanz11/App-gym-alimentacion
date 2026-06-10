@@ -27,4 +27,7 @@ public interface ExerciseLogDao {
 
     @Query("SELECT * FROM exercise_logs WHERE exerciseName = :exerciseName ORDER BY rowid DESC")
     List<ExerciseLog> getByExerciseName(String exerciseName);
+
+    @Query("SELECT el.* FROM exercise_logs el INNER JOIN workout_sessions ws ON el.sessionId = ws.id WHERE el.exerciseName = :exerciseName ORDER BY ws.date DESC LIMIT 10")
+    List<ExerciseLog> getRecentByExerciseName(String exerciseName);
 }

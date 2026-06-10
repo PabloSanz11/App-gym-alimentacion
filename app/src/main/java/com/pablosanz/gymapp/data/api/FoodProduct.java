@@ -12,12 +12,11 @@ public class FoodProduct {
     @SerializedName("nutriments")
     private Nutriments nutriments;
 
+    @SerializedName("brands")
+    private String brands;
+
     public String getProduct_name() { return product_name; }
-    public void setProduct_name(String product_name) { this.product_name = product_name; }
-
     public String getCode() { return code; }
-    public void setCode(String code) { this.code = code; }
-
     public Nutriments getNutriments() { return nutriments; }
-    public void setNutriments(Nutriments nutriments) { this.nutriments = nutriments; }
+    public String getBrands() { return brands; }
 }

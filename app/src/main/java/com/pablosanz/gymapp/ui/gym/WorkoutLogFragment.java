@@ -20,7 +20,9 @@ import com.pablosanz.gymapp.data.repository.GymRepository;
 import com.pablosanz.gymapp.databinding.FragmentWorkoutLogBinding;
 import com.pablosanz.gymapp.util.DateUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class WorkoutLogFragment extends Fragment {
 
@@ -28,6 +30,7 @@ public class WorkoutLogFragment extends Fragment {
     private GymRepository gymRepository;
     private ExerciseSetAdapter adapter;
     private int dayType = 1;
+    private List<Exercise> exercises;
 
     @Nullable
     @Override
@@ -46,41 +49,40 @@ public class WorkoutLogFragment extends Fragment {
         }
 
         gymRepository = new GymRepository(requireActivity().getApplication());
+        exercises = ExerciseData.getExercisesForDay(dayType);
 
         String dayName = ExerciseData.getDayName(dayType);
         binding.toolbarWorkout.setTitle("Día " + dayType + ": " + dayName);
         binding.toolbarWorkout.setNavigationOnClickListener(v ->
                 Navigation.findNavController(v).popBackStack());
 
-        List<Exercise> exercises = ExerciseData.getExercisesForDay(dayType);
-        adapter = new ExerciseSetAdapter(exercises);
-        binding.rvExerciseSets.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.rvExerciseSets.setAdapter(adapter);
+        List<String> names = new ArrayList<>();
+        for (Exercise e : exercises) names.add(e.getName());
+
+        gymRepository.getLastWeightForExercises(names, lastWeights -> {
+            requireActivity().runOnUiThread(() -> {
+                adapter = new ExerciseSetAdapter(exercises, lastWeights);
+                binding.rvExerciseSets.setLayoutManager(new LinearLayoutManager(getContext()));
+                binding.rvExerciseSets.setAdapter(adapter);
+            });
+        });
 
         binding.fabSaveSession.setOnClickListener(v -> saveSession());
     }
 
     private void saveSession() {
-        WorkoutSession session = new WorkoutSession(
-                DateUtils.today(), dayType, 0, "");
-
+        WorkoutSession session = new WorkoutSession(DateUtils.today(), dayType, 0, "");
         gymRepository.insertSession(session, sessionId -> {
             List<ExerciseSetAdapter.ExerciseSetData> items = adapter.getItems();
             for (ExerciseSetAdapter.ExerciseSetData data : items) {
                 if (data.reps > 0 || data.weightKg > 0) {
-                    ExerciseLog log = new ExerciseLog(
-                            sessionId,
-                            data.exercise.getName(),
-                            data.setNumber,
-                            data.reps,
-                            data.weightKg,
-                            "");
+                    ExerciseLog log = new ExerciseLog(sessionId, data.exercise.getName(),
+                            data.setNumber, data.reps, data.weightKg, "");
                     gymRepository.insertExerciseLog(log);
                 }
             }
-
             requireActivity().runOnUiThread(() -> {
-                Toast.makeText(getContext(), "Sesión guardada correctamente", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "¡Entrenamiento guardado!", Toast.LENGTH_SHORT).show();
                 Navigation.findNavController(requireView()).popBackStack();
             });
         });

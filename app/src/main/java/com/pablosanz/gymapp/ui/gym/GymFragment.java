@@ -13,10 +13,10 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.chip.Chip;
 import com.pablosanz.gymapp.R;
 import com.pablosanz.gymapp.data.model.Exercise;
 import com.pablosanz.gymapp.data.model.ExerciseData;
-import com.pablosanz.gymapp.data.model.WorkoutSession;
 import com.pablosanz.gymapp.data.repository.GymRepository;
 import com.pablosanz.gymapp.databinding.FragmentGymBinding;
 
@@ -26,7 +26,7 @@ public class GymFragment extends Fragment {
 
     private FragmentGymBinding binding;
     private GymRepository gymRepository;
-    private int suggestedDayType = 1;
+    private int selectedDayType = 1;
 
     @Nullable
     @Override
@@ -43,9 +43,19 @@ public class GymFragment extends Fragment {
 
         loadSuggestedDay();
 
+        binding.chipGroupDays.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) return;
+            int id = checkedIds.get(0);
+            if (id == R.id.chip_day1) selectedDayType = 1;
+            else if (id == R.id.chip_day2) selectedDayType = 2;
+            else if (id == R.id.chip_day3) selectedDayType = 3;
+            else if (id == R.id.chip_day4) selectedDayType = 4;
+            updateExerciseList();
+        });
+
         binding.btnStartSession.setOnClickListener(v -> {
             Bundle args = new Bundle();
-            args.putInt("dayType", suggestedDayType);
+            args.putInt("dayType", selectedDayType);
             Navigation.findNavController(v).navigate(R.id.action_gymFragment_to_workoutLogFragment, args);
         });
 
@@ -56,31 +66,34 @@ public class GymFragment extends Fragment {
     private void loadSuggestedDay() {
         gymRepository.getLastSession(session -> {
             if (session == null) {
-                suggestedDayType = 1;
+                selectedDayType = 1;
             } else {
-                suggestedDayType = (session.getDayType() % 4) + 1;
+                selectedDayType = (session.getDayType() % 4) + 1;
             }
-
-            new Handler(Looper.getMainLooper()).post(() -> updateUI());
-        });
-
-        gymRepository.getRecentMeasurements(1, measurements -> {
             new Handler(Looper.getMainLooper()).post(() -> {
-                if (measurements != null && !measurements.isEmpty()) {
-                    float weight = measurements.get(0).getWeightKg();
-                    binding.tvLastWeight.setText(String.format("%.1f kg", weight));
-                } else {
-                    binding.tvLastWeight.setText("-- kg");
-                }
+                selectChipForDay(selectedDayType);
+                updateExerciseList();
             });
         });
     }
 
-    private void updateUI() {
-        String dayName = ExerciseData.getDayName(suggestedDayType);
-        binding.tvTodayDayTitle.setText("Día " + suggestedDayType + ": " + dayName);
+    private void selectChipForDay(int dayType) {
+        int chipId;
+        switch (dayType) {
+            case 2: chipId = R.id.chip_day2; break;
+            case 3: chipId = R.id.chip_day3; break;
+            case 4: chipId = R.id.chip_day4; break;
+            default: chipId = R.id.chip_day1; break;
+        }
+        Chip chip = binding.getRoot().findViewById(chipId);
+        if (chip != null) chip.setChecked(true);
+    }
 
-        List<Exercise> exercises = ExerciseData.getExercisesForDay(suggestedDayType);
+    private void updateExerciseList() {
+        String dayName = ExerciseData.getDayName(selectedDayType);
+        binding.tvTodayDayTitle.setText("Día " + selectedDayType + " — " + dayName);
+
+        List<Exercise> exercises = ExerciseData.getExercisesForDay(selectedDayType);
         GymExercisePreviewAdapter adapter = new GymExercisePreviewAdapter(exercises);
         binding.rvTodayExercises.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvTodayExercises.setAdapter(adapter);

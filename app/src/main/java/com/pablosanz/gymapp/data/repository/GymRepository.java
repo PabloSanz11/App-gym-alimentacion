@@ -80,4 +80,32 @@ public class GymRepository {
     public interface OnMeasurementsCallback {
         void onResult(List<BodyMeasurement> measurements);
     }
+
+    public void getExerciseHistory(String exerciseName, OnExerciseLogsCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<ExerciseLog> logs = exerciseLogDao.getByExerciseName(exerciseName);
+            if (callback != null) callback.onResult(logs);
+        });
+    }
+
+    public interface OnExerciseLogsCallback {
+        void onResult(List<ExerciseLog> logs);
+    }
+
+    public void getLastWeightForExercises(List<String> exerciseNames, OnWeightsCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            java.util.Map<String, Float> weights = new java.util.HashMap<>();
+            for (String name : exerciseNames) {
+                List<ExerciseLog> logs = exerciseLogDao.getRecentByExerciseName(name);
+                if (!logs.isEmpty()) {
+                    weights.put(name, logs.get(0).getWeightKg());
+                }
+            }
+            if (callback != null) callback.onResult(weights);
+        });
+    }
+
+    public interface OnWeightsCallback {
+        void onResult(java.util.Map<String, Float> weights);
+    }
 }
