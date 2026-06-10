@@ -4,34 +4,16 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- Left weight plate -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M54,30 C54,30 38,42 38,56 C38,65 45,72 54,72 C63,72 70,65 70,56 C70,42 54,30 54,30 Z"/>
+        android:pathData="M26,46 Q19,46 19,53 L19,55 Q19,62 26,62 L40,62 L40,46 Z"/>
+    <!-- Right weight plate -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M30,50 L78,50 M30,62 L78,62"
-        android:strokeWidth="4"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round"/>
-    <rect
+        android:pathData="M82,46 Q89,46 89,53 L89,55 Q89,62 82,62 L68,62 L68,46 Z"/>
+    <!-- Bar -->
+    <path
         android:fillColor="#FFFFFF"
-        android:left="26"
-        android:top="46"
-        android:right="40"
-        android:bottom="66"
-        android:rx="7"/>
-    <rect
-        android:fillColor="#FFFFFF"
-        android:left="68"
-        android:top="46"
-        android:right="82"
-        android:bottom="66"
-        android:rx="7"/>
-    <rect
-        android:fillColor="#FFFFFF"
-        android:left="40"
-        android:top="52"
-        android:right="68"
-        android:bottom="60"
-        android:rx="4"/>
+        android:pathData="M40,52 L68,52 L68,56 L40,56 Z"/>
 </vector>
