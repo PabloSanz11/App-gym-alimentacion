@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#2E7D32</color>
-    <color name="colorPrimaryDark">#1B5E20</color>
-    <color name="colorPrimaryVariant">#1B5E20</color>
-    <color name="colorAccent">#FF6F00</color>
-    <color name="colorSecondary">#FF6F00</color>
-    <color name="colorBackground">#F5F5F5</color>
+    <!-- Primary: deep midnight navy -->
+    <color name="colorPrimary">#1B3A6B</color>
+    <color name="colorPrimaryDark">#0F2549</color>
+    <color name="colorPrimaryVariant">#0F2549</color>
+    <!-- Accent: electric teal/cyan (city lights on water) -->
+    <color name="colorAccent">#38BDF8</color>
+    <color name="colorSecondary">#38BDF8</color>
+    <!-- Backgrounds -->
+    <color name="colorBackground">#F0F4FF</color>
     <color name="colorSurface">#FFFFFF</color>
+    <!-- Text on primary/secondary -->
     <color name="colorOnPrimary">#FFFFFF</color>
-    <color name="colorOnSecondary">#FFFFFF</color>
-    <color name="colorOnBackground">#212121</color>
-    <color name="colorOnSurface">#212121</color>
-    <color name="colorError">#B00020</color>
+    <color name="colorOnSecondary">#0F2549</color>
+    <color name="colorOnBackground">#1A1A2E</color>
+    <color name="colorOnSurface">#1A1A2E</color>
+    <!-- Status/error -->
+    <color name="colorError">#EF4444</color>
     <color name="colorOnError">#FFFFFF</color>
-    <color name="colorGreenLight">#A5D6A7</color>
-    <color name="colorOrangeLight">#FFCC80</color>
+    <!-- UI extras -->
+    <color name="colorNavyLight">#93C5FD</color>
+    <color name="colorTealLight">#BAE6FD</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="gray_light">#EEEEEE</color>
-    <color name="text_secondary">#757575</color>
-    <color name="ic_launcher_background">#2E7D32</color>
+    <color name="gray_light">#E8EDF5</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="ic_launcher_background">#1B3A6B</color>
 </resources>

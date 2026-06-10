@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.pablosanz.gymapp.data.api.FoodProduct;
 import com.pablosanz.gymapp.data.api.FoodSearchResponse;
+import com.pablosanz.gymapp.data.model.FavoriteFood;
 import com.pablosanz.gymapp.data.model.FoodEntry;
 import com.pablosanz.gymapp.data.model.MealLog;
 import com.pablosanz.gymapp.data.repository.NutritionRepository;
@@ -70,6 +71,14 @@ public class MealLogFragment extends Fragment {
 
         binding.rvFoodResults.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvFoodResults.setAdapter(adapter);
+
+        // Favorite / frequent foods
+        binding.rvFavorites.setLayoutManager(
+                new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        nutritionRepository.getFavoriteFoods(favorites -> requireActivity().runOnUiThread(() -> {
+            FavoriteFoodAdapter favAdapter = new FavoriteFoodAdapter(favorites, this::quickAddFavorite);
+            binding.rvFavorites.setAdapter(favAdapter);
+        }));
 
         binding.etFoodSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -165,6 +174,25 @@ public class MealLogFragment extends Fragment {
 
             requireActivity().runOnUiThread(() -> {
                 Toast.makeText(getContext(), "Alimento agregado", Toast.LENGTH_SHORT).show();
+                Navigation.findNavController(requireView()).popBackStack();
+            });
+        });
+    }
+
+    private void quickAddFavorite(FavoriteFood fav) {
+        nutritionRepository.getOrCreateMealLog(date, mealSlot, mealLog -> {
+            FoodEntry entry = new FoodEntry(
+                    mealLog.getId(), fav.getName(), "",
+                    fav.getProteinG(), fav.getCarbsG(), fav.getCaloriesKcal(),
+                    fav.getFatG(), fav.getDefaultQuantityG());
+            nutritionRepository.insertFoodEntry(entry);
+            mealLog.setTotalProteinG(mealLog.getTotalProteinG() + fav.getProteinG());
+            mealLog.setTotalCarbsG(mealLog.getTotalCarbsG() + fav.getCarbsG());
+            mealLog.setTotalCaloriesKcal(mealLog.getTotalCaloriesKcal() + fav.getCaloriesKcal());
+            mealLog.setTotalFatG(mealLog.getTotalFatG() + fav.getFatG());
+            nutritionRepository.updateMealLog(mealLog);
+            requireActivity().runOnUiThread(() -> {
+                Toast.makeText(getContext(), fav.getName() + " agregado", Toast.LENGTH_SHORT).show();
                 Navigation.findNavController(requireView()).popBackStack();
             });
         });

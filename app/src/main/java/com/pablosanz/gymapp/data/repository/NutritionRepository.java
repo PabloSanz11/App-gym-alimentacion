@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData;
 import com.pablosanz.gymapp.data.api.FoodSearchResponse;
 import com.pablosanz.gymapp.data.api.RetrofitClient;
 import com.pablosanz.gymapp.data.db.AppDatabase;
+import com.pablosanz.gymapp.data.db.FavoriteFoodDao;
 import com.pablosanz.gymapp.data.db.FoodEntryDao;
 import com.pablosanz.gymapp.data.db.MealLogDao;
 import com.pablosanz.gymapp.data.model.FoodEntry;
@@ -22,11 +23,13 @@ public class NutritionRepository {
 
     private final MealLogDao mealLogDao;
     private final FoodEntryDao foodEntryDao;
+    private final FavoriteFoodDao favoriteFoodDao;
 
     public NutritionRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
         mealLogDao = db.mealLogDao();
         foodEntryDao = db.foodEntryDao();
+        favoriteFoodDao = db.favoriteFoodDao();
     }
 
     public LiveData<List<MealLog>> getMealLogsByDate(String date) {
@@ -111,5 +114,16 @@ public class NutritionRepository {
 
     public interface OnWeeklySummaryCallback {
         void onResult(java.util.List<com.pablosanz.gymapp.data.model.MealLog> logs);
+    }
+
+    public void getFavoriteFoods(OnFavoriteFoodsCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<com.pablosanz.gymapp.data.model.FavoriteFood> foods = favoriteFoodDao.getAll();
+            if (callback != null) callback.onResult(foods);
+        });
+    }
+
+    public interface OnFavoriteFoodsCallback {
+        void onResult(List<com.pablosanz.gymapp.data.model.FavoriteFood> foods);
     }
 }

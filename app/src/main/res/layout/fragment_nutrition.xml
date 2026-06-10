@@ -502,7 +502,7 @@
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="8dp"
-                    android:progressTint="@color/colorGreenLight"
+                    android:progressTint="@color/colorTealLight"
                     android:layout_marginBottom="12dp" />
 
                 <!-- Fat -->
@@ -537,7 +537,7 @@
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="8dp"
-                    android:progressTint="@color/colorOrangeLight" />
+                    android:progressTint="@color/colorNavyLight" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
