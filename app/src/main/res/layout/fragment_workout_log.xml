@@ -1,42 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/colorBackground">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar_workout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:titleTextColor="@color/white"
+        app:navigationIconTint="@color/white"
+        app:navigationIcon="@drawable/ic_back" />
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar_workout"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimary"
-            app:navigationIcon="@drawable/ic_add_circle"
-            app:titleTextColor="@color/white" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_exercise_sets"
+    <!-- Timer + total weight strip -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fab_save_session"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:text="@string/workout_save_session"
-        app:backgroundTint="@color/colorPrimary"
-        app:icon="@drawable/ic_gym"
-        app:iconTint="@color/white"
-        android:textColor="@color/white" />
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="14dp">
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="TIEMPO" android:textColor="#FFFFFF" android:alpha="0.7"
+                android:textSize="10sp" android:textAllCaps="true" android:letterSpacing="0.1"/>
+            <TextView android:id="@+id/tv_timer" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="00:00" android:textColor="#FFFFFF"
+                android:textSize="28sp" android:textStyle="bold" android:fontFamily="monospace"/>
+        </LinearLayout>
+
+        <View android:layout_width="1dp" android:layout_height="36dp"
+            android:background="#FFFFFF" android:alpha="0.3"
+            android:layout_gravity="center_vertical" android:layout_marginEnd="20dp"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="TOTAL CARGADO" android:textColor="#FFFFFF" android:alpha="0.7"
+                android:textSize="10sp" android:textAllCaps="true" android:letterSpacing="0.1"/>
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="bottom">
+                <TextView android:id="@+id/tv_total_weight" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="0" android:textColor="#FFFFFF"
+                    android:textSize="28sp" android:textStyle="bold"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text=" kg" android:textColor="#FFFFFF" android:alpha="0.7"
+                    android:textSize="14sp" android:layout_marginBottom="4dp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Exercise indicator bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+        <TextView android:id="@+id/tv_exercise_indicator" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Ejercicio 1 de 7" android:textSize="13sp" android:textColor="#64748B"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="← desliza →" android:textSize="11sp" android:textColor="#9CA3AF"/>
+    </LinearLayout>
+
+    <!-- ViewPager2 -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager_exercises"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Bottom: dots + finish -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
+        <LinearLayout android:id="@+id/layout_dots" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:layout_weight="1"
+            android:orientation="horizontal" android:gravity="center_vertical"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_finish_workout"
+            android:layout_width="wrap_content" android:layout_height="44dp"
+            android:text="Finalizar" android:textColor="@color/white" android:textSize="15sp"
+            app:backgroundTint="@color/colorPrimary" app:cornerRadius="12dp"
+            android:paddingStart="20dp" android:paddingEnd="20dp"/>
+    </LinearLayout>
+
+</LinearLayout>

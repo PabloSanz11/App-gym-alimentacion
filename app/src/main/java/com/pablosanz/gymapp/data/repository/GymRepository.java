@@ -108,4 +108,20 @@ public class GymRepository {
     public interface OnWeightsCallback {
         void onResult(java.util.Map<String, Float> weights);
     }
+
+    public void getRecentHistoryForExercises(List<String> exerciseNames,
+                                              OnHistoryCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            java.util.Map<String, List<ExerciseLog>> result = new java.util.HashMap<>();
+            for (String name : exerciseNames) {
+                List<ExerciseLog> logs = exerciseLogDao.getRecentByExerciseName(name);
+                result.put(name, logs);
+            }
+            if (callback != null) callback.onResult(result);
+        });
+    }
+
+    public interface OnHistoryCallback {
+        void onResult(java.util.Map<String, List<ExerciseLog>> history);
+    }
 }
