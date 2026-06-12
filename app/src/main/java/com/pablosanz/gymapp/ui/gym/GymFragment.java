@@ -71,6 +71,7 @@ public class GymFragment extends Fragment {
                 selectedDayType = (session.getDayType() % 4) + 1;
             }
             new Handler(Looper.getMainLooper()).post(() -> {
+                if (binding == null) return;
                 selectChipForDay(selectedDayType);
                 updateExerciseList();
             });
@@ -90,6 +91,7 @@ public class GymFragment extends Fragment {
     }
 
     private void updateExerciseList() {
+        if (binding == null || getContext() == null) return;
         String dayName = ExerciseData.getDayName(selectedDayType);
         binding.tvTodayDayTitle.setText("Día " + selectedDayType + " — " + dayName);
 

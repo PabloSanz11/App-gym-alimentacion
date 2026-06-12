@@ -50,8 +50,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Create notification channels and schedule meal reminders
-        NotificationHelper.createNotificationChannels(this);
-        NotificationHelper.scheduleAllMealReminders(this);
+        try {
+            NotificationHelper.createNotificationChannels(this);
+            NotificationHelper.scheduleAllMealReminders(this);
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "Notification setup failed", e);
+        }
     }
 
     @Override
