@@ -9,7 +9,6 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_meal_log"
             android:layout_width="match_parent"
@@ -17,145 +16,142 @@
             android:background="@color/colorPrimary"
             app:navigationIcon="@drawable/ic_add_circle"
             app:titleTextColor="@color/white" />
-
     </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- Favoritos section -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Frecuentes"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="#1A1A2E"
-            android:paddingStart="0dp"
-            android:paddingEnd="0dp"
-            android:paddingTop="0dp"
-            android:paddingBottom="8dp"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_favorites"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:paddingBottom="8dp"
-            android:orientation="horizontal"/>
-
-        <!-- Platillos Mexicanos section -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_browse_recipes"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginBottom="8dp"
-            android:text="Ver todos los platillos mexicanos"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/colorPrimary" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Platillos Mexicanos"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="#1A1A2E"
-            android:paddingBottom="8dp"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_recipes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:paddingBottom="12dp"
-            android:orientation="horizontal"/>
-
-        <!-- Search Field -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_food_search"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/meal_search_hint"
-                android:inputType="text"
-                android:imeOptions="actionSearch" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Progress Indicator -->
-        <ProgressBar
-            android:id="@+id/progress_search"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:indeterminate="true"
-            android:visibility="gone"
-            android:layout_marginBottom="8dp" />
-
-        <!-- Selected Food -->
-        <TextView
-            android:id="@+id/tv_selected_food"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="13sp"
-            android:textColor="@color/colorPrimary"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"
-            android:visibility="gone" />
-
-        <!-- Search Results -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_food_results"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginBottom="8dp" />
-
-        <!-- Quantity Input and Save -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="16dp">
+
+            <!-- ── Platillos del plan ───────────────────────────── -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tu plan de comidas"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:paddingBottom="8dp" />
+
+            <!-- Grid 2 columnas para recetas -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_recipes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:layout_marginBottom="12dp" />
+
+            <!-- ── Frecuentes ─────────────────────────────────── -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Frecuentes"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:paddingBottom="8dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_favorites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:paddingBottom="12dp"
+                android:orientation="horizontal"
+                android:nestedScrollingEnabled="false" />
+
+            <!-- ── Buscar alimento ────────────────────────────── -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Buscar alimento"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:paddingBottom="8dp" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_quantity"
+                    android:id="@+id/et_food_search"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/meal_quantity_hint"
-                    android:inputType="numberDecimal"
-                    android:enabled="false" />
-
+                    android:hint="@string/meal_search_hint"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_save_food_entry"
-                android:layout_width="wrap_content"
+            <ProgressBar
+                android:id="@+id/progress_search"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:indeterminate="true"
+                android:visibility="gone"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tv_selected_food"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/meal_save_button"
-                app:backgroundTint="@color/colorPrimary"
-                android:textColor="@color/white"
-                android:enabled="false" />
+                android:textSize="13sp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_food_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:layout_marginBottom="12dp" />
+
+            <!-- ── Cantidad + guardar ─────────────────────────── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_quantity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/meal_quantity_hint"
+                        android:inputType="numberDecimal"
+                        android:enabled="false" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_save_food_entry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/meal_save_button"
+                    app:backgroundTint="@color/colorPrimary"
+                    android:textColor="@color/white"
+                    android:enabled="false" />
+
+            </LinearLayout>
 
         </LinearLayout>
-
-    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

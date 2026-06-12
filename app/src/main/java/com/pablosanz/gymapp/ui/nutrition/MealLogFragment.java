@@ -73,37 +73,31 @@ public class MealLogFragment extends Fragment {
         binding.rvFoodResults.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvFoodResults.setAdapter(adapter);
 
-        binding.btnBrowseRecipes.setOnClickListener(v -> {
-            Bundle recipeArgs = new Bundle();
-            recipeArgs.putString("mealSlot", mealSlot);
-            recipeArgs.putString("date", date);
-            Navigation.findNavController(v)
-                    .navigate(R.id.action_mealLogFragment_to_recipeListFragment, recipeArgs);
+        // Recipes — grid 2 columnas
+        RecipeGridAdapter recipeGridAdapter = new RecipeGridAdapter(recipe -> {
+            Bundle args = new Bundle();
+            args.putLong("recipeId", recipe.getId());
+            args.putString("recipeName", recipe.getName());
+            args.putString("mealSlot", mealSlot);
+            args.putString("date", date);
+            Navigation.findNavController(requireView())
+                    .navigate(R.id.action_mealLogFragment_to_recipeDetailFragment, args);
         });
+        binding.rvRecipes.setLayoutManager(
+                new androidx.recyclerview.widget.GridLayoutManager(getContext(), 2));
+        binding.rvRecipes.setAdapter(recipeGridAdapter);
+        nutritionRepository.getAllRecipes(recipes -> requireActivity().runOnUiThread(() -> {
+            if (binding == null) return;
+            recipeGridAdapter.setItems(recipes);
+        }));
 
-        // Favorite / frequent foods
+        // Frecuentes
         binding.rvFavorites.setLayoutManager(
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         nutritionRepository.getFavoriteFoods(favorites -> requireActivity().runOnUiThread(() -> {
+            if (binding == null) return;
             FavoriteFoodAdapter favAdapter = new FavoriteFoodAdapter(favorites, this::quickAddFavorite);
             binding.rvFavorites.setAdapter(favAdapter);
-        }));
-
-        // Mexican recipes
-        binding.rvRecipes.setLayoutManager(
-                new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        nutritionRepository.getAllRecipes(recipes -> requireActivity().runOnUiThread(() -> {
-            if (binding == null) return;
-            RecipeCardAdapter recipeAdapter = new RecipeCardAdapter(recipes, recipe -> {
-                Bundle args = new Bundle();
-                args.putLong("recipeId", recipe.getId());
-                args.putString("recipeName", recipe.getName());
-                args.putString("mealSlot", mealSlot);
-                args.putString("date", date);
-                Navigation.findNavController(requireView())
-                        .navigate(R.id.action_mealLogFragment_to_recipeDetailFragment, args);
-            });
-            binding.rvRecipes.setAdapter(recipeAdapter);
         }));
 
         binding.etFoodSearch.addTextChangedListener(new TextWatcher() {
