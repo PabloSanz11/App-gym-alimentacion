@@ -49,6 +49,18 @@
             android:orientation="horizontal"/>
 
         <!-- Platillos Mexicanos section -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_browse_recipes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Ver todos los platillos mexicanos"
+            app:backgroundTint="@color/colorPrimary"
+            app:icon="@drawable/ic_nutrition"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:strokeColor="@color/colorPrimary"
+            android:textColor="@color/colorPrimary" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

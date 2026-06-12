@@ -12,6 +12,7 @@ import com.pablosanz.gymapp.data.db.FoodEntryDao;
 import com.pablosanz.gymapp.data.db.MealLogDao;
 import com.pablosanz.gymapp.data.db.RecipeDao;
 import com.pablosanz.gymapp.data.db.RecipeIngredientDao;
+import com.pablosanz.gymapp.data.model.FavoriteFood;
 import com.pablosanz.gymapp.data.model.FoodEntry;
 import com.pablosanz.gymapp.data.model.MealLog;
 import com.pablosanz.gymapp.data.model.Recipe;
@@ -79,11 +80,7 @@ public class NutritionRepository {
                 .enqueue(new Callback<FoodSearchResponse>() {
                     @Override
                     public void onResponse(Call<FoodSearchResponse> call, Response<FoodSearchResponse> response) {
-                        if (response.isSuccessful() && response.body() != null
-                                && response.body().getProducts() != null) {
-                            callback.onSuccess(response.body());
-                        } else if (response.isSuccessful() && response.body() != null) {
-                            // Empty but valid response
+                        if (response.isSuccessful() && response.body() != null) {
                             callback.onSuccess(response.body());
                         } else {
                             callback.onError("Sin resultados (código " + response.code() + ")");
@@ -95,6 +92,63 @@ public class NutritionRepository {
                         callback.onError(t.getMessage() != null ? t.getMessage() : "Sin conexión");
                     }
                 });
+    }
+
+    public void getWeeklySummary(OnWeeklySummaryCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            java.util.List<String> dates = new java.util.ArrayList<>();
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            for (int i = 0; i < 7; i++) {
+                dates.add(com.pablosanz.gymapp.util.DateUtils.formatDate(cal.getTime()));
+                cal.add(java.util.Calendar.DAY_OF_YEAR, -1);
+            }
+            java.util.List<MealLog> logs = mealLogDao.getByDateRange(dates);
+            if (callback != null) callback.onResult(logs);
+        });
+    }
+
+    public void getFavoriteFoods(OnFavoriteFoodsCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<FavoriteFood> foods = favoriteFoodDao.getAll();
+            if (callback != null) callback.onResult(foods);
+        });
+    }
+
+    public void getAllRecipes(OnRecipesCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Recipe> recipes = recipeDao.getAllRecipes();
+            if (callback != null) callback.onResult(recipes);
+        });
+    }
+
+    public void searchRecipes(String query, OnRecipesCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Recipe> recipes = (query == null || query.isEmpty())
+                    ? recipeDao.getAll()
+                    : recipeDao.search(query);
+            if (callback != null) callback.onResult(recipes);
+        });
+    }
+
+    public void getRecipesByCategory(String category, OnRecipesCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Recipe> recipes = recipeDao.getByCategory(category);
+            if (callback != null) callback.onResult(recipes);
+        });
+    }
+
+    public void getRecipeById(long id, OnRecipeCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            Recipe recipe = recipeDao.getById(id);
+            if (callback != null) callback.onResult(recipe);
+        });
+    }
+
+    public void getRecipeIngredients(long recipeId, OnIngredientsCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<RecipeIngredient> items = recipeIngredientDao.getByRecipeId(recipeId);
+            if (callback != null) callback.onResult(items);
+        });
     }
 
     public interface OnInsertCallback {
@@ -110,85 +164,12 @@ public class NutritionRepository {
         void onError(String error);
     }
 
-    public void getWeeklySummary(OnWeeklySummaryCallback callback) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            // Get meal logs for last 7 days
-            java.util.List<String> dates = new java.util.ArrayList<>();
-            java.util.Calendar cal = java.util.Calendar.getInstance();
-            for (int i = 0; i < 7; i++) {
-                dates.add(com.pablosanz.gymapp.util.DateUtils.formatDate(cal.getTime()));
-                cal.add(java.util.Calendar.DAY_OF_YEAR, -1);
-            }
-            java.util.List<com.pablosanz.gymapp.data.model.MealLog> logs = mealLogDao.getByDateRange(dates);
-            if (callback != null) callback.onResult(logs);
-        });
-    }
-
     public interface OnWeeklySummaryCallback {
-        void onResult(java.util.List<com.pablosanz.gymapp.data.model.MealLog> logs);
-    }
-
-    public void searchRecipes(String query, OnRecipesCallback callback) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            List<Recipe> recipes = query.isEmpty()
-                    ? recipeDao.getAll()
-                    : recipeDao.search(query);
-            if (callback != null) callback.onResult(recipes);
-        });
-    }
-
-    public void getRecipesByCategory(String category, OnRecipesCallback callback) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            List<Recipe> recipes = recipeDao.getByCategory(category);
-            if (callback != null) callback.onResult(recipes);
-        });
-    }
-
-    public void getRecipeIngredients(long recipeId, OnIngredientsCallback callback) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            List<RecipeIngredient> ingredients = recipeIngredientDao.getByRecipeId(recipeId);
-            if (callback != null) callback.onResult(ingredients);
-        });
-    }
-
-    public interface OnRecipesCallback {
-        void onResult(List<Recipe> recipes);
-    }
-
-    public interface OnIngredientsCallback {
-        void onResult(List<RecipeIngredient> ingredients);
-    }
-
-    public void getFavoriteFoods(OnFavoriteFoodsCallback callback) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            List<com.pablosanz.gymapp.data.model.FavoriteFood> foods = favoriteFoodDao.getAll();
-            if (callback != null) callback.onResult(foods);
-        });
+        void onResult(java.util.List<MealLog> logs);
     }
 
     public interface OnFavoriteFoodsCallback {
-        void onResult(List<com.pablosanz.gymapp.data.model.FavoriteFood> foods);
-    }
-
-    public void getAllRecipes(OnRecipesCallback callback) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            List<Recipe> recipes = recipeDao.getAllRecipes();
-            if (callback != null) callback.onResult(recipes);
-        });
-    }
-
-    public void getRecipeById(long id, OnRecipeCallback callback) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            Recipe recipe = recipeDao.getById(id);
-            if (callback != null) callback.onResult(recipe);
-        });
-    }
-
-    public void getRecipeIngredients(long recipeId, OnIngredientsCallback callback) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            List<RecipeIngredient> items = recipeIngredientDao.getByRecipe(recipeId);
-            if (callback != null) callback.onResult(items);
-        });
+        void onResult(List<FavoriteFood> foods);
     }
 
     public interface OnRecipesCallback {

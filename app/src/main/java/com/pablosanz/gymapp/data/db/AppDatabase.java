@@ -82,9 +82,9 @@ public abstract class AppDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Queso panela (50g)', 9, 2, 90, 6, 50)");
             db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Papa/camote horneado (300g)', 5, 65, 285, 0, 300)");
 
-            // Mexican recipes
+            // Mexican recipes (with description and imageEmoji)
             // 1. Chilaquiles verdes con pollo
-            db.execSQL("INSERT INTO recipes (name, category, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Chilaquiles verdes con pollo', 'Desayuno', 38, 50, 520, 18)");
+            db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Chilaquiles verdes con pollo', 'Desayuno', 'Totopos bañados en salsa verde con pollo desmenuzado, crema y queso fresco', '🫔', 38, 50, 520, 18)");
             long r1 = getLastInsertId(db);
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r1 + ", 'Totopos (tortilla frita)', 60, 5, 40, 280, 12)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r1 + ", 'Salsa verde', 80, 1, 4, 25, 1)");
@@ -93,7 +93,7 @@ public abstract class AppDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r1 + ", 'Queso fresco (30g)', 30, 6, 2, 75, 6)");
 
             // 2. Bistec con papas
-            db.execSQL("INSERT INTO recipes (name, category, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Bistec con papas', 'Comida', 45, 40, 480, 14)");
+            db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Bistec con papas', 'Comida', 'Bistec de res a la plancha acompañado de papas doradas', '🥩', 45, 40, 480, 14)");
             long r2 = getLastInsertId(db);
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r2 + ", 'Bistec de res', 150, 36, 0, 250, 10)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r2 + ", 'Papa mediana', 200, 5, 38, 180, 0)");
@@ -101,7 +101,7 @@ public abstract class AppDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r2 + ", 'Limón y especias', 10, 0, 1, 4, 0)");
 
             // 3. Licuado post-entreno
-            db.execSQL("INSERT INTO recipes (name, category, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Licuado post-entreno', 'Snack', 42, 60, 490, 8)");
+            db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Licuado post-entreno', 'Snack', 'Licuado proteico con whey, leche, avena y plátano para recuperación', '🥛', 42, 60, 490, 8)");
             long r3 = getLastInsertId(db);
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r3 + ", 'Proteína whey (1 scoop)', 30, 24, 3, 120, 2)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r3 + ", 'Leche entera (300ml)', 300, 10, 14, 185, 10)");
@@ -109,7 +109,7 @@ public abstract class AppDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r3 + ", 'Plátano mediano', 90, 1, 23, 90, 0)");
 
             // 4. Pollo con arroz y verduras
-            db.execSQL("INSERT INTO recipes (name, category, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Pollo con arroz y verduras', 'Comida', 50, 60, 530, 8)");
+            db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Pollo con arroz y verduras', 'Comida', 'Pechuga a la plancha con arroz blanco y verduras al vapor', '🍗', 50, 60, 530, 8)");
             long r4 = getLastInsertId(db);
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r4 + ", 'Pechuga de pollo (150g)', 150, 45, 0, 248, 5)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r4 + ", 'Arroz cocido (200g)', 200, 4, 44, 196, 0)");
@@ -117,7 +117,7 @@ public abstract class AppDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r4 + ", 'Aceite de oliva', 10, 0, 0, 88, 10)");
 
             // 5. Huevos a la mexicana
-            db.execSQL("INSERT INTO recipes (name, category, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Huevos a la mexicana', 'Desayuno', 22, 8, 290, 20)");
+            db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Huevos a la mexicana', 'Desayuno', 'Huevos revueltos con jitomate, cebolla y chile serrano', '🍳', 22, 8, 290, 20)");
             long r5 = getLastInsertId(db);
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r5 + ", 'Huevos (3 pzas)', 150, 18, 2, 225, 15)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r5 + ", 'Jitomate (60g)', 60, 1, 4, 22, 0)");
@@ -125,7 +125,7 @@ public abstract class AppDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r5 + ", 'Aceite (1 cda)', 10, 0, 0, 88, 10)");
 
             // 6. Tacos de atún
-            db.execSQL("INSERT INTO recipes (name, category, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Tacos de atún', 'Cena', 36, 30, 380, 10)");
+            db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Tacos de atún', 'Cena', 'Tacos de tortilla de maíz con atún, aguacate y limón', '🌮', 36, 30, 380, 10)");
             long r6 = getLastInsertId(db);
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r6 + ", 'Atún en agua (1 lata)', 140, 30, 0, 140, 2)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r6 + ", 'Tortillas de maíz (3 pzas)', 75, 5, 45, 220, 3)");
@@ -133,7 +133,7 @@ public abstract class AppDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r6 + ", 'Limón y cilantro', 10, 0, 1, 5, 0)");
 
             // 7. Carne molida con verduras
-            db.execSQL("INSERT INTO recipes (name, category, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Carne molida con verduras', 'Comida', 46, 15, 420, 22)");
+            db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Carne molida con verduras', 'Comida', 'Carne molida guisada con chayote, jitomate y cebolla', '🫕', 46, 15, 420, 22)");
             long r7 = getLastInsertId(db);
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r7 + ", 'Carne molida de res (180g)', 180, 40, 0, 340, 20)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r7 + ", 'Jitomate y cebolla', 80, 2, 8, 40, 0)");
@@ -141,7 +141,7 @@ public abstract class AppDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r7 + ", 'Chile y especias', 15, 0, 2, 10, 0)");
 
             // 8. Ensalada proteica
-            db.execSQL("INSERT INTO recipes (name, category, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Ensalada proteica', 'Cena', 40, 12, 350, 15)");
+            db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Ensalada proteica', 'Cena', 'Ensalada de pollo a la plancha con espinacas, queso panela y aderezo de limón', '🥗', 40, 12, 350, 15)");
             long r8 = getLastInsertId(db);
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r8 + ", 'Pechuga de pollo (120g)', 120, 36, 0, 198, 4)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r8 + ", 'Lechuga y espinacas (100g)', 100, 3, 5, 30, 0)");

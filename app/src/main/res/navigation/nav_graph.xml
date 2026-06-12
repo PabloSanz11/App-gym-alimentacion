@@ -61,6 +61,21 @@
         <action
             android:id="@+id/action_mealLogFragment_to_recipeDetailFragment"
             app:destination="@id/recipeDetailFragment" />
+        <action
+            android:id="@+id/action_mealLogFragment_to_recipeListFragment"
+            app:destination="@id/recipeListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/recipeListFragment"
+        android:name="com.pablosanz.gymapp.ui.nutrition.RecipeListFragment"
+        android:label="Platillos Mexicanos"
+        tools:layout="@layout/fragment_recipe_list">
+        <argument android:name="mealSlot" app:argType="string" android:defaultValue="desayuno"/>
+        <argument android:name="date" app:argType="string" android:defaultValue=""/>
+        <action
+            android:id="@+id/action_recipeListFragment_to_recipeDetailFragment"
+            app:destination="@id/recipeDetailFragment" />
     </fragment>
 
     <fragment
