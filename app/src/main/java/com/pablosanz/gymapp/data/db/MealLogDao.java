@@ -31,4 +31,7 @@ public interface MealLogDao {
 
     @Query("SELECT * FROM meal_logs WHERE date IN (:dates) ORDER BY date DESC")
     List<MealLog> getByDateRange(List<String> dates);
+
+    @Query("SELECT * FROM meal_logs WHERE id = :id LIMIT 1")
+    MealLog getById(long id);
 }

@@ -151,6 +151,53 @@ public class NutritionRepository {
         });
     }
 
+    public void getFoodEntriesByMealLog(long mealLogId, OnEntriesCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<FoodEntry> entries = foodEntryDao.getByMealLogId(mealLogId);
+            if (callback != null) callback.onResult(entries);
+        });
+    }
+
+    public void deleteFoodEntry(FoodEntry entry, Runnable onDone) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            foodEntryDao.delete(entry);
+            recalcMealLogTotals(entry.getMealLogId());
+            if (onDone != null) onDone.run();
+        });
+    }
+
+    public void updateFoodEntryQuantity(FoodEntry entry, float newQty, Runnable onDone) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            float ratio = (entry.getQuantityG() > 0) ? newQty / entry.getQuantityG() : 0;
+            entry.setQuantityG(newQty);
+            entry.setProteinG(entry.getProteinG() * ratio);
+            entry.setCarbsG(entry.getCarbsG() * ratio);
+            entry.setCaloriesKcal(entry.getCaloriesKcal() * ratio);
+            entry.setFatG(entry.getFatG() * ratio);
+            foodEntryDao.update(entry);
+            recalcMealLogTotals(entry.getMealLogId());
+            if (onDone != null) onDone.run();
+        });
+    }
+
+    private void recalcMealLogTotals(long mealLogId) {
+        MealLog log = mealLogDao.getById(mealLogId);
+        if (log == null) return;
+        List<FoodEntry> entries = foodEntryDao.getByMealLogId(mealLogId);
+        float p = 0, c = 0, cal = 0, f = 0;
+        for (FoodEntry e : entries) {
+            p += e.getProteinG();
+            c += e.getCarbsG();
+            cal += e.getCaloriesKcal();
+            f += e.getFatG();
+        }
+        log.setTotalProteinG(p);
+        log.setTotalCarbsG(c);
+        log.setTotalCaloriesKcal(cal);
+        log.setTotalFatG(f);
+        mealLogDao.update(log);
+    }
+
     public interface OnInsertCallback {
         void onInserted(long id);
     }
@@ -182,5 +229,9 @@ public class NutritionRepository {
 
     public interface OnIngredientsCallback {
         void onResult(List<RecipeIngredient> ingredients);
+    }
+
+    public interface OnEntriesCallback {
+        void onResult(List<FoodEntry> entries);
     }
 }

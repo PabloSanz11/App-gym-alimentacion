@@ -64,7 +64,7 @@ public class NutritionFragment extends Fragment {
 
     private void setupHistoryChips() {
         binding.chipGroupHistory.removeAllViews();
-        for (int i = 6; i >= 0; i--) {
+        for (int i = 0; i <= 6; i++) {
             String date = DateUtils.addDays(DateUtils.today(), -i);
             Chip chip = new Chip(requireContext());
             chip.setText(i == 0 ? "Hoy" : DateUtils.formatShort(date));
@@ -107,6 +107,11 @@ public class NutritionFragment extends Fragment {
         binding.btnAddAlmuerzo.setOnClickListener(v -> openMealLog("almuerzo"));
         binding.btnAddMerienda.setOnClickListener(v -> openMealLog("merienda"));
         binding.btnAddCena.setOnClickListener(v -> openMealLog("cena"));
+
+        binding.cardDesayuno.setOnClickListener(v -> openMealDetail("desayuno"));
+        binding.cardAlmuerzo.setOnClickListener(v -> openMealDetail("almuerzo"));
+        binding.cardMerienda.setOnClickListener(v -> openMealDetail("merienda"));
+        binding.cardCena.setOnClickListener(v -> openMealDetail("cena"));
     }
 
     private void openMealLog(String mealSlot) {
@@ -115,6 +120,20 @@ public class NutritionFragment extends Fragment {
         args.putString("date", currentDate);
         Navigation.findNavController(requireView())
                 .navigate(R.id.action_nutritionFragment_to_mealLogFragment, args);
+    }
+
+    private void openMealDetail(String mealSlot) {
+        nutritionRepository.getOrCreateMealLog(currentDate, mealSlot, mealLog -> {
+            Bundle args = new Bundle();
+            args.putString("mealSlot", mealSlot);
+            args.putString("date", currentDate);
+            args.putLong("mealLogId", mealLog.getId());
+            requireActivity().runOnUiThread(() -> {
+                if (binding == null) return;
+                Navigation.findNavController(requireView())
+                        .navigate(R.id.action_nutritionFragment_to_mealDetailFragment, args);
+            });
+        });
     }
 
     private void loadMealData() {
