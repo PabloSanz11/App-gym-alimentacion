@@ -39,6 +39,16 @@ public class DateUtils {
         }
     }
 
+    public static String formatShort(String dateStr) {
+        try {
+            Date date = sdf.get().parse(dateStr);
+            SimpleDateFormat shortFmt = new SimpleDateFormat("EEE dd", new Locale("es", "MX"));
+            return date != null ? shortFmt.format(date) : dateStr;
+        } catch (ParseException e) {
+            return dateStr;
+        }
+    }
+
     public static String addDays(String dateStr, int days) {
         try {
             Date date = sdf.get().parse(dateStr);
