@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
         FavoriteFood.class,
         Recipe.class,
         RecipeIngredient.class
-}, version = 4, exportSchema = false)
+}, version = 5, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract WorkoutSessionDao workoutSessionDao();
@@ -68,19 +68,32 @@ public abstract class AppDatabase extends RoomDatabase {
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
 
-            // Favoritos del plan (acceso rápido sin buscar)
+            // ── Frecuentes del meal prep semanal (PDF) ─────────────────────────
+            // Proteínas cocinadas el domingo
             db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Pollo deshebrado (120g)', 36, 0, 198, 4, 120)");
             db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Pollo en cubos (150g)', 45, 0, 248, 5, 150)");
             db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Carne molida 80/20 (150g)', 30, 0, 290, 18, 150)");
-            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Atún en agua (1 lata)', 30, 0, 140, 2, 140)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Frijol cocido (120g)', 9, 22, 135, 1, 120)");
+            // A la mano — sin cocinar
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Huevo entero (1 pza)', 6, 0, 70, 5, 50)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Claras San Juan (100ml)', 11, 0, 52, 0, 100)");
             db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Queso cottage (150g)', 18, 5, 120, 5, 150)");
             db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Queso panela (80g)', 14, 4, 180, 12, 80)");
-            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Claras San Juan (100ml)', 11, 0, 52, 0, 100)");
-            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Huevo entero (1 pza)', 6, 0, 70, 5, 50)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Atún en agua (1 lata / 140g)', 30, 0, 140, 2, 140)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Totopos horneados HEB (38g)', 3, 28, 180, 6, 38)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Salsa verde (80g)', 1, 4, 25, 0, 80)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Aguacate ¼ (40g)', 1, 4, 64, 6, 40)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Kéfir o leche (240ml)', 8, 12, 150, 8, 240)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Proteína whey (1 scoop / 30g)', 24, 3, 120, 2, 30)");
+            // Guarniciones cocinadas el domingo
             db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Arroz cocido (250g)', 5, 55, 248, 0, 250)");
-            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Frijol cocido (120g)', 9, 22, 135, 1, 120)");
-            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Camote/papa horneado (300g)', 5, 65, 285, 0, 300)");
-            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Aguacate (¼ pza / 40g)', 1, 4, 64, 6, 40)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Camote o papa horneado (300g)', 5, 65, 285, 0, 300)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Pasta integral cocida (200g)', 10, 56, 280, 2, 200)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Avena (¾ taza / 60g)', 8, 40, 228, 4, 60)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Plátano mediano (100g)', 1, 23, 89, 0, 100)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Verduras asadas mix (100g)', 2, 8, 40, 0, 100)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Ensalada de hoja (50g)', 1, 3, 15, 0, 50)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Nueces (30g)', 4, 4, 196, 19, 30)");
 
             // ── Recetas del Plan Maestro (PDF) ──────────────────────────────────
 
