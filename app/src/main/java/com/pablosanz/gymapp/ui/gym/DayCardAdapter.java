@@ -1,9 +1,11 @@
 package com.pablosanz.gymapp.ui.gym;
 
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -20,7 +22,13 @@ public class DayCardAdapter extends RecyclerView.Adapter<DayCardAdapter.ViewHold
 
     public interface OnDayStartListener { void onStart(int dayType); }
 
-    private static final String[] COLORS = {"#1B3A6B", "#16A34A", "#7C3AED", "#EA580C"};
+    // Gradient pairs: [top color, bottom color]
+    private static final int[][] GRADIENTS = {
+        {0xFF1B3A6B, 0xFF2D5FA6},  // Día 1 — azul navy
+        {0xFF16A34A, 0xFF22C55E},  // Día 2 — verde
+        {0xFF7C3AED, 0xFF9F5CF6},  // Día 3 — morado
+        {0xFFEA580C, 0xFFF97316},  // Día 4 — naranja
+    };
     private static final String[] EMOJIS = {"💪", "🦵", "🏋️", "🔥"};
 
     private int suggestedDay = 1;
@@ -47,55 +55,65 @@ public class DayCardAdapter extends RecyclerView.Adapter<DayCardAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder h, int position) {
         int dayType = position + 1;
         List<Exercise> exercises = ExerciseData.getExercisesForDay(dayType);
-        String color = COLORS[position];
+        int[] gradient = GRADIENTS[position];
         String emoji = EMOJIS[position];
         String dayName = ExerciseData.getDayName(dayType);
 
-        h.layoutHeader.setBackgroundColor(Color.parseColor(color));
+        // Gradient background on hero section
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{gradient[0], gradient[1]});
+        h.frameHeader.setBackground(gd);
+
         h.tvEmoji.setText(emoji);
         h.tvDayNumber.setText("DÍA " + dayType);
         h.tvDayMuscle.setText(dayName);
+
         int totalSets = 0;
         for (Exercise e : exercises) totalSets += e.getSetsTarget();
-        h.tvSetsCount.setText(exercises.size() + " ejercicios · " + totalSets + " series");
+        h.tvSetsCount.setText(exercises.size() + " ejercicios  ·  " + totalSets + " series totales");
 
-        // Suggested badge
-        if (dayType == suggestedDay) {
-            h.tvSuggestedBadge.setVisibility(View.VISIBLE);
-        } else {
-            h.tvSuggestedBadge.setVisibility(View.GONE);
-        }
+        h.tvSuggestedBadge.setVisibility(dayType == suggestedDay ? View.VISIBLE : View.GONE);
 
-        // Exercise preview rows
+        // Exercise preview rows (show first 5)
         h.layoutExercises.removeAllViews();
-        for (int i = 0; i < exercises.size(); i++) {
+        int shown = Math.min(exercises.size(), 5);
+        for (int i = 0; i < shown; i++) {
             Exercise ex = exercises.get(i);
             TextView tv = new TextView(h.itemView.getContext());
-            tv.setText("  " + ex.getSetsTarget() + "×" + ex.getRepsTarget() + "   " + ex.getName());
+            tv.setText(ex.getSetsTarget() + "×" + ex.getRepsTarget() + "  " + ex.getName());
             tv.setTextSize(13f);
             tv.setTextColor(Color.parseColor("#3C3C43"));
-            int dp4 = (int)(2 * h.itemView.getContext().getResources().getDisplayMetrics().density);
-            tv.setPadding(0, dp4, 0, dp4);
+            float dp = h.itemView.getContext().getResources().getDisplayMetrics().density;
+            tv.setPadding(0, (int)(2 * dp), 0, (int)(2 * dp));
             h.layoutExercises.addView(tv);
         }
+        if (exercises.size() > 5) {
+            TextView more = new TextView(h.itemView.getContext());
+            more.setText("+" + (exercises.size() - 5) + " más...");
+            more.setTextSize(12f);
+            more.setTextColor(Color.parseColor("#9CA3AF"));
+            h.layoutExercises.addView(more);
+        }
 
-        h.btnStart.setBackgroundColor(Color.parseColor(color));
+        // Iniciar button color matches gradient
+        h.btnStart.setBackgroundColor(gradient[0]);
         h.btnStart.setText("Iniciar Día " + dayType);
         h.btnStart.setOnClickListener(v -> listener.onStart(dayType));
-        h.itemView.setOnClickListener(v -> listener.onStart(dayType));
     }
 
     @Override
     public int getItemCount() { return 4; }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        LinearLayout layoutHeader, layoutExercises;
+        FrameLayout frameHeader;
+        LinearLayout layoutExercises;
         TextView tvEmoji, tvDayNumber, tvDayMuscle, tvSetsCount, tvSuggestedBadge;
         com.google.android.material.button.MaterialButton btnStart;
 
         ViewHolder(@NonNull View v) {
             super(v);
-            layoutHeader = v.findViewById(R.id.layout_day_header);
+            frameHeader = v.findViewById(R.id.layout_day_header);
             layoutExercises = v.findViewById(R.id.layout_exercises);
             tvEmoji = v.findViewById(R.id.tv_day_emoji);
             tvDayNumber = v.findViewById(R.id.tv_day_number);
