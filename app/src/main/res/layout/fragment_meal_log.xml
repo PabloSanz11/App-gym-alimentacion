@@ -48,6 +48,24 @@
             android:paddingBottom="8dp"
             android:orientation="horizontal"/>
 
+        <!-- Platillos Mexicanos section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Platillos Mexicanos"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#1A1A2E"
+            android:paddingBottom="8dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_recipes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingBottom="12dp"
+            android:orientation="horizontal"/>
+
         <!-- Search Field -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"

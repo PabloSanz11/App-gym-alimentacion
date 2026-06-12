@@ -10,8 +10,12 @@ import com.pablosanz.gymapp.data.db.AppDatabase;
 import com.pablosanz.gymapp.data.db.FavoriteFoodDao;
 import com.pablosanz.gymapp.data.db.FoodEntryDao;
 import com.pablosanz.gymapp.data.db.MealLogDao;
+import com.pablosanz.gymapp.data.db.RecipeDao;
+import com.pablosanz.gymapp.data.db.RecipeIngredientDao;
 import com.pablosanz.gymapp.data.model.FoodEntry;
 import com.pablosanz.gymapp.data.model.MealLog;
+import com.pablosanz.gymapp.data.model.Recipe;
+import com.pablosanz.gymapp.data.model.RecipeIngredient;
 
 import java.util.List;
 
@@ -24,12 +28,16 @@ public class NutritionRepository {
     private final MealLogDao mealLogDao;
     private final FoodEntryDao foodEntryDao;
     private final FavoriteFoodDao favoriteFoodDao;
+    private final RecipeDao recipeDao;
+    private final RecipeIngredientDao recipeIngredientDao;
 
     public NutritionRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
         mealLogDao = db.mealLogDao();
         foodEntryDao = db.foodEntryDao();
         favoriteFoodDao = db.favoriteFoodDao();
+        recipeDao = db.recipeDao();
+        recipeIngredientDao = db.recipeIngredientDao();
     }
 
     public LiveData<List<MealLog>> getMealLogsByDate(String date) {
@@ -125,5 +133,38 @@ public class NutritionRepository {
 
     public interface OnFavoriteFoodsCallback {
         void onResult(List<com.pablosanz.gymapp.data.model.FavoriteFood> foods);
+    }
+
+    public void getAllRecipes(OnRecipesCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Recipe> recipes = recipeDao.getAllRecipes();
+            if (callback != null) callback.onResult(recipes);
+        });
+    }
+
+    public void getRecipeById(long id, OnRecipeCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            Recipe recipe = recipeDao.getById(id);
+            if (callback != null) callback.onResult(recipe);
+        });
+    }
+
+    public void getRecipeIngredients(long recipeId, OnIngredientsCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<RecipeIngredient> items = recipeIngredientDao.getByRecipe(recipeId);
+            if (callback != null) callback.onResult(items);
+        });
+    }
+
+    public interface OnRecipesCallback {
+        void onResult(List<Recipe> recipes);
+    }
+
+    public interface OnRecipeCallback {
+        void onResult(Recipe recipe);
+    }
+
+    public interface OnIngredientsCallback {
+        void onResult(List<RecipeIngredient> ingredients);
     }
 }

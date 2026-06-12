@@ -58,6 +58,20 @@
             android:name="date"
             app:argType="string"
             android:defaultValue="" />
+        <action
+            android:id="@+id/action_mealLogFragment_to_recipeDetailFragment"
+            app:destination="@id/recipeDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/recipeDetailFragment"
+        android:name="com.pablosanz.gymapp.ui.nutrition.RecipeDetailFragment"
+        android:label="Detalle Platillo"
+        tools:layout="@layout/fragment_recipe_detail">
+        <argument android:name="recipeId" app:argType="long" android:defaultValue="0L"/>
+        <argument android:name="recipeName" app:argType="string" android:defaultValue=""/>
+        <argument android:name="mealSlot" app:argType="string" android:defaultValue="desayuno"/>
+        <argument android:name="date" app:argType="string" android:defaultValue=""/>
     </fragment>
 
     <fragment
