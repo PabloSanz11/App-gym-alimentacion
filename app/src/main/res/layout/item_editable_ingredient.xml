@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="8dp"
+    android:gravity="center_vertical">
+
+    <!-- Ingredient name (editable) -->
+    <EditText
+        android:id="@+id/et_ingredient_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="14sp"
+        android:textColor="#1A1A2E"
+        android:background="@null"
+        android:inputType="text"
+        android:hint="Ingrediente"
+        android:paddingEnd="4dp" />
+
+    <!-- Macros summary -->
+    <TextView
+        android:id="@+id/tv_ingredient_macros"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="11sp"
+        android:textColor="#64748B"
+        android:paddingHorizontal="4dp" />
+
+    <!-- Quantity (editable, g) -->
+    <EditText
+        android:id="@+id/et_ingredient_qty"
+        android:layout_width="52dp"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="#1B3A6B"
+        android:textStyle="bold"
+        android:inputType="numberDecimal"
+        android:background="@null"
+        android:gravity="center"
+        android:hint="g" />
+
+    <!-- Delete button -->
+    <ImageButton
+        android:id="@+id/btn_delete_ingredient"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Eliminar"
+        android:tint="#EF4444" />
+
+</LinearLayout>
