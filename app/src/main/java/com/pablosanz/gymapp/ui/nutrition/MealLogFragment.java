@@ -89,6 +89,23 @@ public class MealLogFragment extends Fragment {
             binding.rvFavorites.setAdapter(favAdapter);
         }));
 
+        // Mexican recipes
+        binding.rvRecipes.setLayoutManager(
+                new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        nutritionRepository.getAllRecipes(recipes -> requireActivity().runOnUiThread(() -> {
+            if (binding == null) return;
+            RecipeCardAdapter recipeAdapter = new RecipeCardAdapter(recipes, recipe -> {
+                Bundle args = new Bundle();
+                args.putLong("recipeId", recipe.getId());
+                args.putString("recipeName", recipe.getName());
+                args.putString("mealSlot", mealSlot);
+                args.putString("date", date);
+                Navigation.findNavController(requireView())
+                        .navigate(R.id.action_mealLogFragment_to_recipeDetailFragment, args);
+            });
+            binding.rvRecipes.setAdapter(recipeAdapter);
+        }));
+
         binding.etFoodSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}

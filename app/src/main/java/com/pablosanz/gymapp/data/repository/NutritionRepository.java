@@ -169,4 +169,37 @@ public class NutritionRepository {
     public interface OnFavoriteFoodsCallback {
         void onResult(List<com.pablosanz.gymapp.data.model.FavoriteFood> foods);
     }
+
+    public void getAllRecipes(OnRecipesCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Recipe> recipes = recipeDao.getAllRecipes();
+            if (callback != null) callback.onResult(recipes);
+        });
+    }
+
+    public void getRecipeById(long id, OnRecipeCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            Recipe recipe = recipeDao.getById(id);
+            if (callback != null) callback.onResult(recipe);
+        });
+    }
+
+    public void getRecipeIngredients(long recipeId, OnIngredientsCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<RecipeIngredient> items = recipeIngredientDao.getByRecipe(recipeId);
+            if (callback != null) callback.onResult(items);
+        });
+    }
+
+    public interface OnRecipesCallback {
+        void onResult(List<Recipe> recipes);
+    }
+
+    public interface OnRecipeCallback {
+        void onResult(Recipe recipe);
+    }
+
+    public interface OnIngredientsCallback {
+        void onResult(List<RecipeIngredient> ingredients);
+    }
 }

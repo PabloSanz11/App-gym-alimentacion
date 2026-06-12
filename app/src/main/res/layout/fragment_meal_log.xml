@@ -48,18 +48,23 @@
             android:paddingBottom="8dp"
             android:orientation="horizontal"/>
 
-        <!-- Browse recipes button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_browse_recipes"
+        <!-- Platillos Mexicanos section -->
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginBottom="12dp"
-            android:text="🍽 Buscar por platillo completo"
-            android:textColor="@color/colorPrimary"
-            android:textSize="14sp"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            app:cornerRadius="12dp"
-            app:strokeColor="@color/colorPrimary"/>
+            android:layout_height="wrap_content"
+            android:text="Platillos Mexicanos"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#1A1A2E"
+            android:paddingBottom="8dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_recipes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingBottom="12dp"
+            android:orientation="horizontal"/>
 
         <!-- Search Field -->
         <com.google.android.material.textfield.TextInputLayout

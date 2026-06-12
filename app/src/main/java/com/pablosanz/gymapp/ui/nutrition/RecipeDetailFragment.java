@@ -12,10 +12,12 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.pablosanz.gymapp.databinding.FragmentRecipeDetailBinding;
+import com.pablosanz.gymapp.R;
 import com.pablosanz.gymapp.data.model.FoodEntry;
+import com.pablosanz.gymapp.data.model.Recipe;
 import com.pablosanz.gymapp.data.model.RecipeIngredient;
 import com.pablosanz.gymapp.data.repository.NutritionRepository;
+import com.pablosanz.gymapp.databinding.FragmentRecipeDetailBinding;
 
 import java.util.List;
 
@@ -23,9 +25,7 @@ public class RecipeDetailFragment extends Fragment {
 
     private FragmentRecipeDetailBinding binding;
     private NutritionRepository nutritionRepository;
-    private RecipeIngredientAdapter ingredientAdapter;
     private long recipeId;
-    private String recipeName;
     private String mealSlot;
     private String date;
 
@@ -40,72 +40,69 @@ public class RecipeDetailFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (getArguments() != null) {
-            recipeId = getArguments().getLong("recipeId");
-            recipeName = getArguments().getString("recipeName", "Platillo");
-            mealSlot = getArguments().getString("mealSlot", "almuerzo");
-            date = getArguments().getString("date");
+
+        Bundle args = getArguments();
+        if (args != null) {
+            recipeId = args.getLong("recipeId", 0L);
+            mealSlot = args.getString("mealSlot", "desayuno");
+            date = args.getString("date", "");
         }
+
         nutritionRepository = new NutritionRepository(requireActivity().getApplication());
 
-        binding.toolbarRecipeDetail.setTitle(recipeName);
         binding.toolbarRecipeDetail.setNavigationOnClickListener(v ->
                 Navigation.findNavController(v).popBackStack());
-        binding.tvRecipeSubtitle.setText("Activa o desactiva ingredientes según tu preparación");
 
-        ingredientAdapter = new RecipeIngredientAdapter();
-        ingredientAdapter.setOnTotalsChangedListener(() ->
-                updateTotals(ingredientAdapter.getItems()));
-        binding.rvIngredients.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.rvIngredients.setAdapter(ingredientAdapter);
+        loadRecipeDetail();
+    }
 
-        nutritionRepository.getRecipeIngredients(recipeId, ingredients ->
+    private void loadRecipeDetail() {
+        nutritionRepository.getRecipeById(recipeId, recipe -> {
+            if (recipe == null || getActivity() == null) return;
+            nutritionRepository.getRecipeIngredients(recipeId, ingredients -> {
                 requireActivity().runOnUiThread(() -> {
-                    ingredientAdapter.setItems(ingredients);
-                    updateTotals(ingredients);
-                }));
-
-        binding.btnAddRecipe.setOnClickListener(v -> addRecipeToMeal());
+                    if (binding == null) return;
+                    displayRecipe(recipe, ingredients);
+                });
+            });
+        });
     }
 
-    private void updateTotals(List<RecipeIngredient> ingredients) {
-        float cal = 0, prot = 0, carbs = 0, fat = 0;
-        for (RecipeIngredient i : ingredients) {
-            if (i.isIncluded()) {
-                cal += i.getCaloriesKcal();
-                prot += i.getProteinG();
-                carbs += i.getCarbsG();
-                fat += i.getFatG();
-            }
-        }
-        binding.tvTotals.setText(String.format("%.0f kcal  ·  P: %.0fg  ·  C: %.0fg  ·  G: %.0fg",
-                cal, prot, carbs, fat));
+    private void displayRecipe(Recipe recipe, List<RecipeIngredient> ingredients) {
+        binding.toolbarRecipeDetail.setTitle(recipe.getName());
+        binding.tvRecipeCalories.setText(String.format("%.0f kcal", recipe.getTotalCaloriesKcal()));
+        binding.tvRecipeProtein.setText(String.format("P: %.0fg", recipe.getTotalProteinG()));
+        binding.tvRecipeCarbs.setText(String.format("C: %.0fg", recipe.getTotalCarbsG()));
+        binding.tvRecipeFat.setText(String.format("G: %.0fg", recipe.getTotalFatG()));
+
+        RecipeIngredientAdapter adapter = new RecipeIngredientAdapter(ingredients);
+        binding.rvIngredients.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.rvIngredients.setAdapter(adapter);
+
+        binding.btnAddRecipe.setOnClickListener(v -> addRecipeToMeal(recipe));
     }
 
-    private void addRecipeToMeal() {
-        List<RecipeIngredient> items = ingredientAdapter.getItems();
-        float totalCal = 0, totalProt = 0, totalCarbs = 0, totalFat = 0;
-        for (RecipeIngredient i : items) {
-            if (i.isIncluded()) {
-                totalCal += i.getCaloriesKcal();
-                totalProt += i.getProteinG();
-                totalCarbs += i.getCarbsG();
-                totalFat += i.getFatG();
-            }
-        }
-        final float fCal = totalCal, fProt = totalProt, fCarbs = totalCarbs, fFat = totalFat;
+    private void addRecipeToMeal(Recipe recipe) {
         nutritionRepository.getOrCreateMealLog(date, mealSlot, mealLog -> {
-            FoodEntry entry = new FoodEntry(mealLog.getId(), recipeName, "",
-                    fProt, fCarbs, fCal, fFat, 0f);
+            FoodEntry entry = new FoodEntry(
+                    mealLog.getId(),
+                    recipe.getName(),
+                    "",
+                    recipe.getTotalProteinG(),
+                    recipe.getTotalCarbsG(),
+                    recipe.getTotalCaloriesKcal(),
+                    recipe.getTotalFatG(),
+                    0);
             nutritionRepository.insertFoodEntry(entry);
-            mealLog.setTotalCaloriesKcal(mealLog.getTotalCaloriesKcal() + fCal);
-            mealLog.setTotalProteinG(mealLog.getTotalProteinG() + fProt);
-            mealLog.setTotalCarbsG(mealLog.getTotalCarbsG() + fCarbs);
-            mealLog.setTotalFatG(mealLog.getTotalFatG() + fFat);
+
+            mealLog.setTotalProteinG(mealLog.getTotalProteinG() + recipe.getTotalProteinG());
+            mealLog.setTotalCarbsG(mealLog.getTotalCarbsG() + recipe.getTotalCarbsG());
+            mealLog.setTotalCaloriesKcal(mealLog.getTotalCaloriesKcal() + recipe.getTotalCaloriesKcal());
+            mealLog.setTotalFatG(mealLog.getTotalFatG() + recipe.getTotalFatG());
             nutritionRepository.updateMealLog(mealLog);
+
             requireActivity().runOnUiThread(() -> {
-                Toast.makeText(getContext(), recipeName + " agregado al " + mealSlot, Toast.LENGTH_SHORT).show();
-                Navigation.findNavController(requireView()).popBackStack();
+                Toast.makeText(getContext(), recipe.getName() + " agregado", Toast.LENGTH_SHORT).show();
                 Navigation.findNavController(requireView()).popBackStack();
             });
         });

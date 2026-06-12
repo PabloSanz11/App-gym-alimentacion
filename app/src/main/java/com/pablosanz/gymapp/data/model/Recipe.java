@@ -5,27 +5,39 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "recipes")
 public class Recipe {
+
     @PrimaryKey(autoGenerate = true)
     private long id;
     private String name;
-    private String description;
-    private String category; // "desayuno", "comida", "cena", "cualquiera"
-    private String imageEmoji; // e.g. "🌮"
+    private String category;
+    private float totalProteinG;
+    private float totalCarbsG;
+    private float totalCaloriesKcal;
+    private float totalFatG;
 
-    public Recipe() {}
-    public Recipe(String name, String description, String category, String imageEmoji) {
-        this.name = name; this.description = description;
-        this.category = category; this.imageEmoji = imageEmoji;
+    public Recipe(String name, String category,
+                  float totalProteinG, float totalCarbsG,
+                  float totalCaloriesKcal, float totalFatG) {
+        this.name = name;
+        this.category = category;
+        this.totalProteinG = totalProteinG;
+        this.totalCarbsG = totalCarbsG;
+        this.totalCaloriesKcal = totalCaloriesKcal;
+        this.totalFatG = totalFatG;
     }
-    // getters and setters for all fields
+
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
-    public String getImageEmoji() { return imageEmoji; }
-    public void setImageEmoji(String imageEmoji) { this.imageEmoji = imageEmoji; }
+    public float getTotalProteinG() { return totalProteinG; }
+    public void setTotalProteinG(float totalProteinG) { this.totalProteinG = totalProteinG; }
+    public float getTotalCarbsG() { return totalCarbsG; }
+    public void setTotalCarbsG(float totalCarbsG) { this.totalCarbsG = totalCarbsG; }
+    public float getTotalCaloriesKcal() { return totalCaloriesKcal; }
+    public void setTotalCaloriesKcal(float totalCaloriesKcal) { this.totalCaloriesKcal = totalCaloriesKcal; }
+    public float getTotalFatG() { return totalFatG; }
+    public void setTotalFatG(float totalFatG) { this.totalFatG = totalFatG; }
 }
