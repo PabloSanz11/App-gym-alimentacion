@@ -48,7 +48,7 @@ public class MealDetailFragment extends Fragment {
         if (getArguments() != null) {
             mealSlot = getArguments().getString("mealSlot", "desayuno");
             date = getArguments().getString("date", DateUtils.today());
-            mealLogId = getArguments().getLong("mealLogId", -1L);
+            mealLogId = getArguments().getInt("mealLogId", -1);
         }
 
         repo = new NutritionRepository(requireActivity().getApplication());

@@ -127,7 +127,7 @@ public class NutritionFragment extends Fragment {
             Bundle args = new Bundle();
             args.putString("mealSlot", mealSlot);
             args.putString("date", currentDate);
-            args.putLong("mealLogId", mealLog.getId());
+            args.putInt("mealLogId", (int) mealLog.getId());
             requireActivity().runOnUiThread(() -> {
                 if (binding == null) return;
                 Navigation.findNavController(requireView())
