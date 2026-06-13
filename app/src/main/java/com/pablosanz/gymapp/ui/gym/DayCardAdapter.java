@@ -1,5 +1,6 @@
 package com.pablosanz.gymapp.ui.gym;
 
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
@@ -97,7 +98,7 @@ public class DayCardAdapter extends RecyclerView.Adapter<DayCardAdapter.ViewHold
         }
 
         // Iniciar button color matches gradient
-        h.btnStart.setBackgroundColor(gradient[0]);
+        h.btnStart.setBackgroundTintList(ColorStateList.valueOf(gradient[0]));
         h.btnStart.setText("Iniciar Día " + dayType);
         h.btnStart.setOnClickListener(v -> listener.onStart(dayType));
     }

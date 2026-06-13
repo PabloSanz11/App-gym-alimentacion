@@ -55,7 +55,7 @@
         tools:layout="@layout/fragment_meal_detail">
         <argument android:name="mealSlot" app:argType="string" android:defaultValue="desayuno"/>
         <argument android:name="date" app:argType="string" android:defaultValue=""/>
-        <argument android:name="mealLogId" app:argType="long" android:defaultValue="-1L"/>
+        <argument android:name="mealLogId" app:argType="long" android:defaultValue="-1"/>
         <action
             android:id="@+id/action_mealDetailFragment_to_mealLogFragment"
             app:destination="@id/mealLogFragment" />
