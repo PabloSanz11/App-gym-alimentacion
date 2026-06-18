@@ -234,6 +234,13 @@ public class NutritionRepository {
         });
     }
 
+    public void getMealPlanForDaySlot(String day, String slot, OnMealPlanEntryCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            MealPlanEntry entry = day != null ? mealPlanDao.getByDayAndSlot(day, slot) : null;
+            if (callback != null) callback.onResult(entry);
+        });
+    }
+
     public void getMealPlan(OnMealPlanCallback callback) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             List<MealPlanEntry> entries = mealPlanDao.getAll();
@@ -274,6 +281,10 @@ public class NutritionRepository {
 
     public interface OnMealPlanCallback {
         void onResult(List<MealPlanEntry> entries);
+    }
+
+    public interface OnMealPlanEntryCallback {
+        void onResult(MealPlanEntry entry);
     }
 
     public interface OnShoppingListCallback {

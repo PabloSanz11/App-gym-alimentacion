@@ -16,6 +16,7 @@ public class Recipe {
     private float totalCarbsG;
     private float totalCaloriesKcal;
     private float totalFatG;
+    private String prepSteps;
 
     public Recipe(String name, String category, String description, String imageEmoji,
                   float totalProteinG, float totalCarbsG,
@@ -48,4 +49,6 @@ public class Recipe {
     public void setTotalCaloriesKcal(float v) { this.totalCaloriesKcal = v; }
     public float getTotalFatG() { return totalFatG; }
     public void setTotalFatG(float v) { this.totalFatG = v; }
+    public String getPrepSteps() { return prepSteps; }
+    public void setPrepSteps(String prepSteps) { this.prepSteps = prepSteps; }
 }

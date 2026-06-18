@@ -22,10 +22,14 @@ import com.pablosanz.gymapp.data.api.FoodSearchResponse;
 import com.pablosanz.gymapp.data.model.FavoriteFood;
 import com.pablosanz.gymapp.data.model.FoodEntry;
 import com.pablosanz.gymapp.data.model.MealLog;
+import com.pablosanz.gymapp.data.model.MealPlanEntry;
+import com.pablosanz.gymapp.data.model.RecipeIngredient;
 import com.pablosanz.gymapp.data.repository.NutritionRepository;
 import com.pablosanz.gymapp.databinding.FragmentMealLogBinding;
+import com.pablosanz.gymapp.util.DateUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MealLogFragment extends Fragment {
 
@@ -121,6 +125,59 @@ public class MealLogFragment extends Fragment {
         binding.btnSaveFoodEntry.setEnabled(false);
         binding.etQuantity.setEnabled(false);
         binding.btnSaveFoodEntry.setOnClickListener(v -> saveFoodEntry());
+
+        loadWeeklyPreselection();
+    }
+
+    private void loadWeeklyPreselection() {
+        String day = DateUtils.dayOfWeekName(date);
+        if (day == null) return;
+        nutritionRepository.getMealPlanForDaySlot(day, mealSlot, entry -> requireActivity().runOnUiThread(() -> {
+            if (binding == null || entry == null) return;
+            binding.tvPreselectionName.setText(entry.getRecipeName());
+            nutritionRepository.getRecipeIngredients(entry.getRecipeId(), ingredients -> requireActivity().runOnUiThread(() -> {
+                if (binding == null) return;
+                float p = 0, c = 0, cal = 0, f = 0;
+                for (RecipeIngredient ing : ingredients) {
+                    p += ing.getProteinG();
+                    c += ing.getCarbsG();
+                    cal += ing.getCaloriesKcal();
+                    f += ing.getFatG();
+                }
+                binding.tvPreselectionMacros.setText(
+                        Math.round(cal) + " kcal · " + Math.round(p) + "g prot · " + Math.round(c) + "g carbs");
+            }));
+            binding.cardWeeklyPreselection.setVisibility(View.VISIBLE);
+            binding.btnAddPreselection.setOnClickListener(v -> quickAddPreselection(entry));
+        }));
+    }
+
+    private void quickAddPreselection(MealPlanEntry entry) {
+        nutritionRepository.getRecipeIngredients(entry.getRecipeId(), ingredients -> {
+            float p = 0, c = 0, cal = 0, f = 0;
+            for (RecipeIngredient ing : ingredients) {
+                p += ing.getProteinG();
+                c += ing.getCarbsG();
+                cal += ing.getCaloriesKcal();
+                f += ing.getFatG();
+            }
+            final float protein = p, carbs = c, calories = cal, fat = f;
+            nutritionRepository.getOrCreateMealLog(date, mealSlot, mealLog -> {
+                FoodEntry foodEntry = new FoodEntry(
+                        mealLog.getId(), entry.getRecipeName(), "",
+                        protein, carbs, calories, fat, 0);
+                nutritionRepository.insertFoodEntry(foodEntry);
+                mealLog.setTotalProteinG(mealLog.getTotalProteinG() + protein);
+                mealLog.setTotalCarbsG(mealLog.getTotalCarbsG() + carbs);
+                mealLog.setTotalCaloriesKcal(mealLog.getTotalCaloriesKcal() + calories);
+                mealLog.setTotalFatG(mealLog.getTotalFatG() + fat);
+                nutritionRepository.updateMealLog(mealLog);
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(getContext(), entry.getRecipeName() + " agregado", Toast.LENGTH_SHORT).show();
+                    Navigation.findNavController(requireView()).popBackStack();
+                });
+            });
+        });
     }
 
     private void searchFood(String query) {

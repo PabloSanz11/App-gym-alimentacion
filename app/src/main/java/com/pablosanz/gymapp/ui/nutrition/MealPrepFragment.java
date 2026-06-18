@@ -273,20 +273,56 @@ public class MealPrepFragment extends Fragment {
             empty.setTextColor(Color.parseColor("#6C6C70"));
             binding.layoutPrepOrder.addView(empty);
         } else {
-            Map<Long, String> uniqueRecipes = new java.util.LinkedHashMap<>();
-            for (MealPlanEntry e : plan) uniqueRecipes.put(e.getRecipeId(), e.getRecipeName());
+            Map<Long, Recipe> uniqueRecipes = new java.util.LinkedHashMap<>();
+            for (MealPlanEntry e : plan) {
+                if (uniqueRecipes.containsKey(e.getRecipeId())) continue;
+                Recipe r = findRecipeById(e.getRecipeId());
+                if (r != null) uniqueRecipes.put(e.getRecipeId(), r);
+            }
+            List<Recipe> ordered = new ArrayList<>(uniqueRecipes.values());
+            ordered.sort((a, b) -> Integer.compare(cookPriority(a.getName()), cookPriority(b.getName())));
+
             int step = 1;
-            for (Map.Entry<Long, String> e : uniqueRecipes.entrySet()) {
-                TextView tv = new TextView(requireContext());
-                tv.setText(step + ". " + e.getValue());
-                tv.setTextSize(14f);
-                tv.setTextColor(Color.parseColor("#1C1C1E"));
-                tv.setPadding(0, dpToPx(4), 0, dpToPx(4));
-                binding.layoutPrepOrder.addView(tv);
+            for (Recipe r : ordered) {
+                TextView header = new TextView(requireContext());
+                header.setText(step + ". " + r.getName());
+                header.setTextSize(14f);
+                header.setTypeface(null, android.graphics.Typeface.BOLD);
+                header.setTextColor(Color.parseColor("#1B3A6B"));
+                header.setPadding(0, dpToPx(10), 0, dpToPx(2));
+                binding.layoutPrepOrder.addView(header);
+
+                String steps = r.getPrepSteps();
+                TextView tvSteps = new TextView(requireContext());
+                tvSteps.setText(steps != null && !steps.trim().isEmpty()
+                        ? steps : "Cocina los ingredientes de la receta y porciona al terminar.");
+                tvSteps.setTextSize(13f);
+                tvSteps.setTextColor(Color.parseColor("#1C1C1E"));
+                tvSteps.setLineSpacing(dpToPx(2), 1f);
+                binding.layoutPrepOrder.addView(tvSteps);
                 step++;
             }
         }
         binding.cardPrepOrder.setVisibility(View.VISIBLE);
+    }
+
+    private Recipe findRecipeById(long id) {
+        for (Recipe r : allRecipes) {
+            if (r.getId() == id) return r;
+        }
+        return null;
+    }
+
+    /** Lower number = start cooking sooner (longer/slower-cooking dishes go first so they can simmer
+     *  while quicker dishes and assembly happen in parallel, following the PDF's prep-order guidance). */
+    private int cookPriority(String name) {
+        String n = name.toLowerCase();
+        if (n.contains("lenteja")) return 1;
+        if (n.contains("picadillo") || n.contains("tinga")) return 2;
+        if (n.contains("muffin")) return 2;
+        if (n.contains("carne") || n.contains("res") || n.contains("salteado") || n.contains("pollo")) return 3;
+        if (n.contains("chilaquiles") || n.contains("huevos")) return 4;
+        return 5;
     }
 
     private void showShoppingList(List<ShoppingListItem> items) {
