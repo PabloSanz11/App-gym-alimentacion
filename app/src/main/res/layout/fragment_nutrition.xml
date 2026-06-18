@@ -190,6 +190,18 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Meal Prep Domingo entry point -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_meal_prep"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:text="🗓️ Meal Prep Domingo — planea tu semana"
+            app:backgroundTint="@color/colorSecondary"
+            android:textColor="@color/white" />
+
         <!-- Historial rápido: chips últimos 7 días -->
         <HorizontalScrollView
             android:layout_width="match_parent"
@@ -238,6 +250,7 @@
                     </LinearLayout>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nutrition_time_desayuno" android:textSize="12sp" android:textColor="#6C6C70" android:layout_marginTop="2dp" />
                     <TextView android:id="@+id/tv_desayuno_macros" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nutrition_no_records" android:textSize="13sp" android:textColor="@color/colorPrimary" android:layout_marginTop="4dp" />
+                    <TextView android:id="@+id/btn_view_recipe_desayuno" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📖 Ver receta" android:textSize="12sp" android:textStyle="bold" android:textColor="@color/colorPrimary" android:layout_marginTop="4dp" android:visibility="gone" android:padding="2dp" />
                 </LinearLayout>
                 <com.google.android.material.button.MaterialButton android:id="@+id/btn_add_desayuno" android:layout_width="40dp" android:layout_height="40dp" android:text="@string/nutrition_add_food" android:textSize="20sp" android:textColor="@color/white" app:backgroundTint="@color/colorPrimary" style="@style/Widget.Material3.Button.IconButton.Filled" android:minWidth="0dp" android:minHeight="0dp" android:paddingStart="0dp" android:paddingEnd="0dp" />
             </LinearLayout>
@@ -262,6 +275,7 @@
                     </LinearLayout>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nutrition_time_almuerzo" android:textSize="12sp" android:textColor="#6C6C70" android:layout_marginTop="2dp" />
                     <TextView android:id="@+id/tv_almuerzo_macros" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nutrition_no_records" android:textSize="13sp" android:textColor="@color/colorPrimary" android:layout_marginTop="4dp" />
+                    <TextView android:id="@+id/btn_view_recipe_almuerzo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📖 Ver receta" android:textSize="12sp" android:textStyle="bold" android:textColor="@color/colorPrimary" android:layout_marginTop="4dp" android:visibility="gone" android:padding="2dp" />
                 </LinearLayout>
                 <com.google.android.material.button.MaterialButton android:id="@+id/btn_add_almuerzo" android:layout_width="40dp" android:layout_height="40dp" android:text="@string/nutrition_add_food" android:textSize="20sp" android:textColor="@color/white" app:backgroundTint="@color/colorPrimary" style="@style/Widget.Material3.Button.IconButton.Filled" android:minWidth="0dp" android:minHeight="0dp" android:paddingStart="0dp" android:paddingEnd="0dp" />
             </LinearLayout>
@@ -286,6 +300,7 @@
                     </LinearLayout>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nutrition_time_merienda" android:textSize="12sp" android:textColor="#6C6C70" android:layout_marginTop="2dp" />
                     <TextView android:id="@+id/tv_merienda_macros" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nutrition_no_records" android:textSize="13sp" android:textColor="@color/colorPrimary" android:layout_marginTop="4dp" />
+                    <TextView android:id="@+id/btn_view_recipe_merienda" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📖 Ver receta" android:textSize="12sp" android:textStyle="bold" android:textColor="@color/colorPrimary" android:layout_marginTop="4dp" android:visibility="gone" android:padding="2dp" />
                 </LinearLayout>
                 <com.google.android.material.button.MaterialButton android:id="@+id/btn_add_merienda" android:layout_width="40dp" android:layout_height="40dp" android:text="@string/nutrition_add_food" android:textSize="20sp" android:textColor="@color/white" app:backgroundTint="@color/colorPrimary" style="@style/Widget.Material3.Button.IconButton.Filled" android:minWidth="0dp" android:minHeight="0dp" android:paddingStart="0dp" android:paddingEnd="0dp" />
             </LinearLayout>
@@ -310,6 +325,7 @@
                     </LinearLayout>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nutrition_time_cena" android:textSize="12sp" android:textColor="#6C6C70" android:layout_marginTop="2dp" />
                     <TextView android:id="@+id/tv_cena_macros" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nutrition_no_records" android:textSize="13sp" android:textColor="@color/colorPrimary" android:layout_marginTop="4dp" />
+                    <TextView android:id="@+id/btn_view_recipe_cena" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📖 Ver receta" android:textSize="12sp" android:textStyle="bold" android:textColor="@color/colorPrimary" android:layout_marginTop="4dp" android:visibility="gone" android:padding="2dp" />
                 </LinearLayout>
                 <com.google.android.material.button.MaterialButton android:id="@+id/btn_add_cena" android:layout_width="40dp" android:layout_height="40dp" android:text="@string/nutrition_add_food" android:textSize="20sp" android:textColor="@color/white" app:backgroundTint="@color/colorPrimary" style="@style/Widget.Material3.Button.IconButton.Filled" android:minWidth="0dp" android:minHeight="0dp" android:paddingStart="0dp" android:paddingEnd="0dp" />
             </LinearLayout>

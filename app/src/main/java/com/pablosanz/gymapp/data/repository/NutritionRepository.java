@@ -10,15 +10,22 @@ import com.pablosanz.gymapp.data.db.AppDatabase;
 import com.pablosanz.gymapp.data.db.FavoriteFoodDao;
 import com.pablosanz.gymapp.data.db.FoodEntryDao;
 import com.pablosanz.gymapp.data.db.MealLogDao;
+import com.pablosanz.gymapp.data.db.MealPlanDao;
 import com.pablosanz.gymapp.data.db.RecipeDao;
 import com.pablosanz.gymapp.data.db.RecipeIngredientDao;
+import com.pablosanz.gymapp.data.db.ShoppingListDao;
 import com.pablosanz.gymapp.data.model.FavoriteFood;
 import com.pablosanz.gymapp.data.model.FoodEntry;
 import com.pablosanz.gymapp.data.model.MealLog;
+import com.pablosanz.gymapp.data.model.MealPlanEntry;
 import com.pablosanz.gymapp.data.model.Recipe;
 import com.pablosanz.gymapp.data.model.RecipeIngredient;
+import com.pablosanz.gymapp.data.model.ShoppingListItem;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,6 +38,8 @@ public class NutritionRepository {
     private final FavoriteFoodDao favoriteFoodDao;
     private final RecipeDao recipeDao;
     private final RecipeIngredientDao recipeIngredientDao;
+    private final MealPlanDao mealPlanDao;
+    private final ShoppingListDao shoppingListDao;
 
     public NutritionRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
@@ -39,6 +48,8 @@ public class NutritionRepository {
         favoriteFoodDao = db.favoriteFoodDao();
         recipeDao = db.recipeDao();
         recipeIngredientDao = db.recipeIngredientDao();
+        mealPlanDao = db.mealPlanDao();
+        shoppingListDao = db.shoppingListDao();
     }
 
     public LiveData<List<MealLog>> getMealLogsByDate(String date) {
@@ -196,6 +207,70 @@ public class NutritionRepository {
         log.setTotalCaloriesKcal(cal);
         log.setTotalFatG(f);
         mealLogDao.update(log);
+    }
+
+    public void setMealPlan(String day, String slot, long recipeId, String recipeName, Runnable onDone) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            mealPlanDao.insert(new MealPlanEntry(day, slot, recipeId, recipeName));
+            if (onDone != null) onDone.run();
+        });
+    }
+
+    public void clearMealPlanSlot(String day, String slot, Runnable onDone) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            mealPlanDao.clearSlot(day, slot);
+            if (onDone != null) onDone.run();
+        });
+    }
+
+    public void getMealPlan(OnMealPlanCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<MealPlanEntry> entries = mealPlanDao.getAll();
+            if (callback != null) callback.onResult(entries);
+        });
+    }
+
+    public void generateShoppingList(OnShoppingListCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<MealPlanEntry> plan = mealPlanDao.getAll();
+            Map<String, Float> totals = new LinkedHashMap<>();
+            for (MealPlanEntry entry : plan) {
+                List<RecipeIngredient> ingredients = recipeIngredientDao.getByRecipeId(entry.getRecipeId());
+                for (RecipeIngredient ing : ingredients) {
+                    totals.merge(ing.getIngredientName(), ing.getQuantityG(), Float::sum);
+                }
+            }
+            shoppingListDao.clearAll();
+            List<ShoppingListItem> items = new ArrayList<>();
+            for (Map.Entry<String, Float> e : totals.entrySet()) {
+                items.add(new ShoppingListItem(e.getKey(), e.getValue(), false));
+            }
+            if (!items.isEmpty()) shoppingListDao.insertAll(items);
+            if (callback != null) callback.onResult(items, plan);
+        });
+    }
+
+    public void getShoppingList(OnShoppingItemsCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<ShoppingListItem> items = shoppingListDao.getAll();
+            if (callback != null) callback.onResult(items);
+        });
+    }
+
+    public void updateShoppingItem(ShoppingListItem item) {
+        AppDatabase.databaseWriteExecutor.execute(() -> shoppingListDao.update(item));
+    }
+
+    public interface OnMealPlanCallback {
+        void onResult(List<MealPlanEntry> entries);
+    }
+
+    public interface OnShoppingListCallback {
+        void onResult(List<ShoppingListItem> items, List<MealPlanEntry> plan);
+    }
+
+    public interface OnShoppingItemsCallback {
+        void onResult(List<ShoppingListItem> items);
     }
 
     public interface OnInsertCallback {

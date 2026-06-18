@@ -46,7 +46,19 @@
         <action
             android:id="@+id/action_nutritionFragment_to_mealDetailFragment"
             app:destination="@id/mealDetailFragment" />
+        <action
+            android:id="@+id/action_nutritionFragment_to_recipeDetailFragment"
+            app:destination="@id/recipeDetailFragment" />
+        <action
+            android:id="@+id/action_nutritionFragment_to_mealPrepFragment"
+            app:destination="@id/mealPrepFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/mealPrepFragment"
+        android:name="com.pablosanz.gymapp.ui.nutrition.MealPrepFragment"
+        android:label="Meal Prep Domingo"
+        tools:layout="@layout/fragment_meal_prep" />
 
     <fragment
         android:id="@+id/mealDetailFragment"
@@ -103,6 +115,7 @@
         <argument android:name="recipeName" app:argType="string" android:defaultValue=""/>
         <argument android:name="mealSlot" app:argType="string" android:defaultValue="desayuno"/>
         <argument android:name="date" app:argType="string" android:defaultValue=""/>
+        <argument android:name="viewOnly" app:argType="boolean" android:defaultValue="false"/>
     </fragment>
 
     <fragment

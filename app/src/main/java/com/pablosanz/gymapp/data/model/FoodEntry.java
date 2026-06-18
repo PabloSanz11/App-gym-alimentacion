@@ -25,6 +25,7 @@ public class FoodEntry {
     private float caloriesKcal;
     private float fatG;
     private float quantityG;
+    private long recipeId = -1;
 
     public FoodEntry() {}
 
@@ -66,4 +67,7 @@ public class FoodEntry {
 
     public float getQuantityG() { return quantityG; }
     public void setQuantityG(float quantityG) { this.quantityG = quantityG; }
+
+    public long getRecipeId() { return recipeId; }
+    public void setRecipeId(long recipeId) { this.recipeId = recipeId; }
 }

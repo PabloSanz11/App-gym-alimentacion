@@ -1,9 +1,16 @@
 package com.pablosanz.gymapp.ui.nutrition;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -11,7 +18,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.pablosanz.gymapp.R;
+import com.pablosanz.gymapp.data.api.FoodProduct;
+import com.pablosanz.gymapp.data.api.FoodSearchResponse;
 import com.pablosanz.gymapp.data.model.FoodEntry;
 import com.pablosanz.gymapp.data.model.Recipe;
 import com.pablosanz.gymapp.data.model.RecipeIngredient;
@@ -31,6 +42,7 @@ public class RecipeDetailFragment extends Fragment {
     private Recipe recipe;
     private List<RecipeIngredient> editableIngredients = new ArrayList<>();
     private EditableIngredientAdapter ingredientAdapter;
+    private boolean viewOnly;
 
     @Nullable
     @Override
@@ -49,6 +61,7 @@ public class RecipeDetailFragment extends Fragment {
             recipeId = args.getLong("recipeId", 0L);
             mealSlot = args.getString("mealSlot", "desayuno");
             date = args.getString("date", "");
+            viewOnly = args.getBoolean("viewOnly", false);
         }
 
         nutritionRepository = new NutritionRepository(requireActivity().getApplication());
@@ -60,11 +73,12 @@ public class RecipeDetailFragment extends Fragment {
         binding.rvIngredients.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvIngredients.setAdapter(ingredientAdapter);
 
-        binding.btnAddIngredient.setOnClickListener(v -> {
-            RecipeIngredient blank = new RecipeIngredient(recipeId, "Nuevo ingrediente", 100, 0, 0, 0, 0);
-            editableIngredients.add(blank);
-            ingredientAdapter.notifyItemInserted(editableIngredients.size() - 1);
-        });
+        binding.btnAddIngredient.setOnClickListener(v -> showSearchIngredientDialog());
+
+        if (viewOnly) {
+            binding.btnAddIngredient.setVisibility(View.GONE);
+            binding.btnAddRecipe.setVisibility(View.GONE);
+        }
 
         loadRecipeDetail();
     }
@@ -90,6 +104,94 @@ public class RecipeDetailFragment extends Fragment {
         requireActivity().runOnUiThread(this::updateMacroSummary);
     }
 
+    private void showSearchIngredientDialog() {
+        View dialogView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.dialog_search_ingredient, null);
+        EditText etSearch = dialogView.findViewById(R.id.et_search_ingredient);
+        ProgressBar progress = dialogView.findViewById(R.id.progress_search_ingredient);
+        RecyclerView rvResults = dialogView.findViewById(R.id.rv_search_ingredient_results);
+
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setTitle("Buscar ingrediente")
+                .setView(dialogView)
+                .setNegativeButton("Cancelar", null)
+                .create();
+
+        FoodSearchAdapter adapter = new FoodSearchAdapter(new ArrayList<>(), product -> {
+            dialog.dismiss();
+            promptQuantityAndAdd(product);
+        });
+        rvResults.setLayoutManager(new LinearLayoutManager(requireContext()));
+        rvResults.setAdapter(adapter);
+
+        Handler searchHandler = new Handler(Looper.getMainLooper());
+        final Runnable[] searchRunnable = new Runnable[1];
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+            @Override public void afterTextChanged(Editable s) {}
+            @Override
+            public void onTextChanged(CharSequence s, int st, int b, int c) {
+                if (searchRunnable[0] != null) searchHandler.removeCallbacks(searchRunnable[0]);
+                final String query = s.toString().trim();
+                if (query.length() < 2) return;
+                searchRunnable[0] = () -> {
+                    progress.setVisibility(View.VISIBLE);
+                    nutritionRepository.searchFood(query, new NutritionRepository.OnFoodSearchCallback() {
+                        @Override
+                        public void onSuccess(FoodSearchResponse response) {
+                            requireActivity().runOnUiThread(() -> {
+                                progress.setVisibility(View.GONE);
+                                if (response.getProducts() != null) adapter.updateData(response.getProducts());
+                            });
+                        }
+                        @Override
+                        public void onError(String error) {
+                            requireActivity().runOnUiThread(() -> progress.setVisibility(View.GONE));
+                        }
+                    });
+                };
+                searchHandler.postDelayed(searchRunnable[0], 500);
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void promptQuantityAndAdd(FoodProduct product) {
+        EditText etQty = new EditText(requireContext());
+        etQty.setHint("Cantidad en gramos");
+        etQty.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        etQty.setText("100");
+
+        String name = product.getProduct_name() != null ? product.getProduct_name() : "Ingrediente";
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle(name)
+                .setMessage("¿Cuántos gramos vas a usar?")
+                .setView(etQty)
+                .setPositiveButton("Agregar", (d, w) -> {
+                    float qty;
+                    try {
+                        qty = Float.parseFloat(etQty.getText().toString().trim());
+                    } catch (NumberFormatException e) {
+                        qty = 100f;
+                    }
+                    float proteins100 = product.getNutriments() != null ? product.getNutriments().getProteins_100g() : 0;
+                    float carbs100 = product.getNutriments() != null ? product.getNutriments().getCarbohydrates_100g() : 0;
+                    float cals100 = product.getNutriments() != null ? product.getNutriments().getEnergy_100g() : 0;
+                    float fat100 = product.getNutriments() != null ? product.getNutriments().getFat_100g() : 0;
+
+                    RecipeIngredient ingredient = new RecipeIngredient(recipeId, name, qty,
+                            (proteins100 * qty) / 100f, (carbs100 * qty) / 100f,
+                            (cals100 * qty) / 100f, (fat100 * qty) / 100f);
+                    editableIngredients.add(ingredient);
+                    ingredientAdapter.notifyItemInserted(editableIngredients.size() - 1);
+                    updateMacroSummary();
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
     private void updateMacroSummary() {
         float protein = 0, carbs = 0, cals = 0, fat = 0;
         for (RecipeIngredient ing : editableIngredients) {
@@ -109,10 +211,14 @@ public class RecipeDetailFragment extends Fragment {
 
     private void addToMeal(float protein, float carbs, float cals, float fat) {
         String name = recipe != null ? recipe.getName() : "Platillo";
+        float totalQtyG = 0;
+        for (RecipeIngredient ing : editableIngredients) totalQtyG += ing.getQuantityG();
+        final float qtyG = totalQtyG;
         nutritionRepository.getOrCreateMealLog(date, mealSlot, mealLog -> {
             FoodEntry entry = new FoodEntry(
                     mealLog.getId(), name, "",
-                    protein, carbs, cals, fat, 0);
+                    protein, carbs, cals, fat, qtyG);
+            entry.setRecipeId(recipeId);
             nutritionRepository.insertFoodEntry(entry);
             mealLog.setTotalProteinG(mealLog.getTotalProteinG() + protein);
             mealLog.setTotalCarbsG(mealLog.getTotalCarbsG() + carbs);

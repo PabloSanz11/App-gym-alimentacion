@@ -13,8 +13,10 @@ import com.pablosanz.gymapp.data.model.ExerciseLog;
 import com.pablosanz.gymapp.data.model.FavoriteFood;
 import com.pablosanz.gymapp.data.model.FoodEntry;
 import com.pablosanz.gymapp.data.model.MealLog;
+import com.pablosanz.gymapp.data.model.MealPlanEntry;
 import com.pablosanz.gymapp.data.model.Recipe;
 import com.pablosanz.gymapp.data.model.RecipeIngredient;
+import com.pablosanz.gymapp.data.model.ShoppingListItem;
 import com.pablosanz.gymapp.data.model.WorkoutSession;
 
 import java.util.concurrent.ExecutorService;
@@ -28,8 +30,10 @@ import java.util.concurrent.Executors;
         FoodEntry.class,
         FavoriteFood.class,
         Recipe.class,
-        RecipeIngredient.class
-}, version = 5, exportSchema = false)
+        RecipeIngredient.class,
+        MealPlanEntry.class,
+        ShoppingListItem.class
+}, version = 7, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract WorkoutSessionDao workoutSessionDao();
@@ -40,6 +44,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract FavoriteFoodDao favoriteFoodDao();
     public abstract RecipeDao recipeDao();
     public abstract RecipeIngredientDao recipeIngredientDao();
+    public abstract MealPlanDao mealPlanDao();
+    public abstract ShoppingListDao shoppingListDao();
 
     public static final ExecutorService databaseWriteExecutor =
             Executors.newFixedThreadPool(4);

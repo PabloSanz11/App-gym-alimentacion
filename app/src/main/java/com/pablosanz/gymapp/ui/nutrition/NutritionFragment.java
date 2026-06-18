@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.chip.Chip;
 import com.pablosanz.gymapp.R;
+import com.pablosanz.gymapp.data.model.FoodEntry;
 import com.pablosanz.gymapp.data.model.MealLog;
 import com.pablosanz.gymapp.data.repository.NutritionRepository;
 import com.pablosanz.gymapp.databinding.FragmentNutritionBinding;
@@ -112,6 +113,9 @@ public class NutritionFragment extends Fragment {
         binding.cardAlmuerzo.setOnClickListener(v -> openMealDetail("almuerzo"));
         binding.cardMerienda.setOnClickListener(v -> openMealDetail("merienda"));
         binding.cardCena.setOnClickListener(v -> openMealDetail("cena"));
+
+        binding.btnMealPrep.setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.action_nutritionFragment_to_mealPrepFragment));
     }
 
     private void openMealLog(String mealSlot) {
@@ -149,20 +153,36 @@ public class NutritionFragment extends Fragment {
 
                 switch (log.getMealSlot()) {
                     case "desayuno":
-                        binding.tvDesayunoMacros.setText(formatMacros(log)); break;
+                        binding.tvDesayunoMacros.setText(formatMacros(log));
+                        loadRecipeButton(log.getId(), binding.btnViewRecipeDesayuno); break;
                     case "almuerzo":
-                        binding.tvAlmuerzoMacros.setText(formatMacros(log)); break;
+                        binding.tvAlmuerzoMacros.setText(formatMacros(log));
+                        loadRecipeButton(log.getId(), binding.btnViewRecipeAlmuerzo); break;
                     case "merienda":
-                        binding.tvMeriendaMacros.setText(formatMacros(log)); break;
+                        binding.tvMeriendaMacros.setText(formatMacros(log));
+                        loadRecipeButton(log.getId(), binding.btnViewRecipeMerienda); break;
                     case "cena":
-                        binding.tvCenaMacros.setText(formatMacros(log)); break;
+                        binding.tvCenaMacros.setText(formatMacros(log));
+                        loadRecipeButton(log.getId(), binding.btnViewRecipeCena); break;
                 }
             }
 
-            if (!hasMealSlot(mealLogs, "desayuno")) binding.tvDesayunoMacros.setText("Sin registros");
-            if (!hasMealSlot(mealLogs, "almuerzo")) binding.tvAlmuerzoMacros.setText("Sin registros");
-            if (!hasMealSlot(mealLogs, "merienda")) binding.tvMeriendaMacros.setText("Sin registros");
-            if (!hasMealSlot(mealLogs, "cena")) binding.tvCenaMacros.setText("Sin registros");
+            if (!hasMealSlot(mealLogs, "desayuno")) {
+                binding.tvDesayunoMacros.setText("Sin registros");
+                binding.btnViewRecipeDesayuno.setVisibility(View.GONE);
+            }
+            if (!hasMealSlot(mealLogs, "almuerzo")) {
+                binding.tvAlmuerzoMacros.setText("Sin registros");
+                binding.btnViewRecipeAlmuerzo.setVisibility(View.GONE);
+            }
+            if (!hasMealSlot(mealLogs, "merienda")) {
+                binding.tvMeriendaMacros.setText("Sin registros");
+                binding.btnViewRecipeMerienda.setVisibility(View.GONE);
+            }
+            if (!hasMealSlot(mealLogs, "cena")) {
+                binding.tvCenaMacros.setText("Sin registros");
+                binding.btnViewRecipeCena.setVisibility(View.GONE);
+            }
 
             // Header protein bar
             binding.tvHeaderProteinCurrent.setText(String.format("%.0f", totalProtein));
@@ -188,6 +208,32 @@ public class NutritionFragment extends Fragment {
             binding.progressCarbs.setProgress((int) Math.min(totalCarbs, GOAL_CARBS));
             binding.progressFat.setMax((int) GOAL_FAT);
             binding.progressFat.setProgress((int) Math.min(totalFat, GOAL_FAT));
+        });
+    }
+
+    private void loadRecipeButton(long mealLogId, android.widget.TextView button) {
+        nutritionRepository.getFoodEntriesByMealLog(mealLogId, entries -> {
+            FoodEntry recipeEntry = null;
+            for (FoodEntry e : entries) {
+                if (e.getRecipeId() > 0) { recipeEntry = e; break; }
+            }
+            final FoodEntry found = recipeEntry;
+            requireActivity().runOnUiThread(() -> {
+                if (binding == null) return;
+                if (found != null) {
+                    button.setVisibility(View.VISIBLE);
+                    button.setOnClickListener(v -> {
+                        Bundle args = new Bundle();
+                        args.putLong("recipeId", found.getRecipeId());
+                        args.putString("recipeName", found.getFoodName());
+                        args.putBoolean("viewOnly", true);
+                        Navigation.findNavController(requireView())
+                                .navigate(R.id.action_nutritionFragment_to_recipeDetailFragment, args);
+                    });
+                } else {
+                    button.setVisibility(View.GONE);
+                }
+            });
         });
     }
 
