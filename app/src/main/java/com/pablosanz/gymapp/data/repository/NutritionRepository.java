@@ -155,6 +155,17 @@ public class NutritionRepository {
         });
     }
 
+    public void insertRecipeIngredient(RecipeIngredient ingredient, Runnable onDone) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            recipeIngredientDao.insert(ingredient);
+            if (onDone != null) onDone.run();
+        });
+    }
+
+    public void updateRecipe(Recipe recipe) {
+        AppDatabase.databaseWriteExecutor.execute(() -> recipeDao.update(recipe));
+    }
+
     public void getRecipeIngredients(long recipeId, OnIngredientsCallback callback) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             List<RecipeIngredient> items = recipeIngredientDao.getByRecipeId(recipeId);

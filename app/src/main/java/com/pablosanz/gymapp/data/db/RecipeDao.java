@@ -3,6 +3,7 @@ package com.pablosanz.gymapp.data.db;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import com.pablosanz.gymapp.data.model.Recipe;
 
@@ -12,6 +13,9 @@ import java.util.List;
 public interface RecipeDao {
     @Insert
     long insert(Recipe recipe);
+
+    @Update
+    void update(Recipe recipe);
 
     @Query("SELECT * FROM recipes ORDER BY name ASC")
     List<Recipe> getAllRecipes();

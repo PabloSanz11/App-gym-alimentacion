@@ -197,6 +197,7 @@ public class RecipeDetailFragment extends Fragment {
                     editableIngredients.add(ingredient);
                     ingredientAdapter.notifyItemInserted(editableIngredients.size() - 1);
                     updateMacroSummary();
+                    persistIngredientAndRecipeTotals(ingredient);
                 })
                 .setNegativeButton("Cancelar", null)
                 .show();
@@ -217,6 +218,24 @@ public class RecipeDetailFragment extends Fragment {
 
         final float fProtein = protein, fCarbs = carbs, fCals = cals, fFat = fat;
         binding.btnAddRecipe.setOnClickListener(v -> addToMeal(fProtein, fCarbs, fCals, fFat));
+    }
+
+    private void persistIngredientAndRecipeTotals(RecipeIngredient ingredient) {
+        nutritionRepository.insertRecipeIngredient(ingredient, () -> {
+            if (recipe == null) return;
+            float protein = 0, carbs = 0, cals = 0, fat = 0;
+            for (RecipeIngredient ing : editableIngredients) {
+                protein += ing.getProteinG();
+                carbs += ing.getCarbsG();
+                cals += ing.getCaloriesKcal();
+                fat += ing.getFatG();
+            }
+            recipe.setTotalProteinG(protein);
+            recipe.setTotalCarbsG(carbs);
+            recipe.setTotalCaloriesKcal(cals);
+            recipe.setTotalFatG(fat);
+            nutritionRepository.updateRecipe(recipe);
+        });
     }
 
     private void addToMeal(float protein, float carbs, float cals, float fat) {

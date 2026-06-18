@@ -37,7 +37,7 @@
                 android:id="@+id/tv_shopping_total"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total estimado: $0.00"
+                android:text="0 ingredientes"
                 android:textColor="#FFFFFF"
                 android:alpha="0.8"
                 android:textSize="13sp"
@@ -85,6 +85,17 @@
             android:progressTint="@color/colorPrimary"
             android:max="100" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_shopping_empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Aún no hay lista de compras. Genera tu plan semanal en Meal Prep Domingo (sección Nutrición) para crearla automáticamente."
+        android:textSize="14sp"
+        android:textColor="#64748B"
+        android:gravity="center"
+        android:padding="32dp"
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_shopping"
