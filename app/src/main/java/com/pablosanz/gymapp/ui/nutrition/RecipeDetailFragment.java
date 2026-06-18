@@ -141,7 +141,7 @@ public class RecipeDetailFragment extends Fragment {
                         public void onSuccess(FoodSearchResponse response) {
                             requireActivity().runOnUiThread(() -> {
                                 progress.setVisibility(View.GONE);
-                                if (response.getProducts() != null) adapter.updateData(response.getProducts());
+                                if (response.getProducts() != null) adapter.updateData(filterUsableProducts(response.getProducts()));
                             });
                         }
                         @Override
@@ -155,6 +155,16 @@ public class RecipeDetailFragment extends Fragment {
         });
 
         dialog.show();
+    }
+
+    private java.util.List<FoodProduct> filterUsableProducts(java.util.List<FoodProduct> products) {
+        java.util.List<FoodProduct> result = new ArrayList<>();
+        for (FoodProduct p : products) {
+            if (p.getProduct_name() == null || p.getProduct_name().trim().isEmpty()) continue;
+            if (p.getNutriments() == null) continue;
+            result.add(p);
+        }
+        return result;
     }
 
     private void promptQuantityAndAdd(FoodProduct product) {

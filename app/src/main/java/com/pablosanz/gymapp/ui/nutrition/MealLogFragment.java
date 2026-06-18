@@ -131,7 +131,7 @@ public class MealLogFragment extends Fragment {
                 requireActivity().runOnUiThread(() -> {
                     binding.progressSearch.setVisibility(View.GONE);
                     if (response.getProducts() != null) {
-                        adapter.updateData(response.getProducts());
+                        adapter.updateData(filterUsableProducts(response.getProducts()));
                     }
                 });
             }
@@ -144,6 +144,16 @@ public class MealLogFragment extends Fragment {
                 });
             }
         });
+    }
+
+    private java.util.List<FoodProduct> filterUsableProducts(java.util.List<FoodProduct> products) {
+        java.util.List<FoodProduct> result = new ArrayList<>();
+        for (FoodProduct p : products) {
+            if (p.getProduct_name() == null || p.getProduct_name().trim().isEmpty()) continue;
+            if (p.getNutriments() == null) continue;
+            result.add(p);
+        }
+        return result;
     }
 
     private void saveFoodEntry() {

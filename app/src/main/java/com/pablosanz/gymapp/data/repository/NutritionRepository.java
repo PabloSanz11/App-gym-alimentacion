@@ -87,7 +87,7 @@ public class NutritionRepository {
 
     public void searchFood(String query, OnFoodSearchCallback callback) {
         RetrofitClient.getInstance().getService()
-                .searchFood("process", query, 1, 20, "product_name,brands,nutriments,code", "es", "mx")
+                .searchFood("process", query, 1, 25, "product_name,brands,nutriments,code", "es", "unique_scans_n")
                 .enqueue(new Callback<FoodSearchResponse>() {
                     @Override
                     public void onResponse(Call<FoodSearchResponse> call, Response<FoodSearchResponse> response) {

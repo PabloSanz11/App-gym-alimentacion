@@ -33,7 +33,7 @@ import java.util.concurrent.Executors;
         RecipeIngredient.class,
         MealPlanEntry.class,
         ShoppingListItem.class
-}, version = 7, exportSchema = false)
+}, version = 8, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract WorkoutSessionDao workoutSessionDao();
@@ -105,12 +105,13 @@ public abstract class AppDatabase extends RoomDatabase {
 
             // 1. Licuado post-entreno — 9am (fija)
             // 1 scoop whey + 1 taza kéfir/leche + ¾ taza avena + plátano → ~41g P
-            db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Licuado post-entreno', '9am — Fija', '1 scoop proteína + kéfir o leche + avena + plátano · ~41g proteína', '🥛', 41, 78, 587, 12)");
+            db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Licuado post-entreno', '9am — Fija', '1 scoop proteína + kéfir o leche + avena + plátano + crema de cacahuate · ~41g proteína', '🥛', 41, 81, 677, 22)");
             long r1 = getLastInsertId(db);
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r1 + ", 'Proteína whey (1 scoop)', 30, 24, 3, 120, 2)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r1 + ", 'Kéfir o leche (240ml)', 240, 8, 12, 150, 8)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r1 + ", 'Avena (¾ taza / 60g)', 60, 8, 40, 228, 4)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r1 + ", 'Plátano mediano (100g)', 100, 1, 23, 89, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r1 + ", 'Crema de cacahuate (1 cda / 16g)', 16, 0, 3, 90, 8)");
 
             // 2. Chilaquiles verdes proteicos — 12pm (rotativa Lun/Jue)
             // 38g totopos horneados + salsa verde + 150g cottage + 1 huevo + 100ml claras + ¼ aguacate → ~40g P
@@ -183,6 +184,63 @@ public abstract class AppDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r9 + ", 'Kéfir (200ml)', 200, 7, 10, 130, 7)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r9 + ", 'Fruta de temporada (100g)', 100, 1, 15, 65, 0)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r9 + ", 'Nueces (30g)', 30, 4, 4, 196, 19)");
+
+            // 10. Picadillo proteico de res y frijol — 8pm (cena lista para calentar, sirve 5)
+            db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Picadillo proteico de res y frijol', '8pm — Cena (meal prep)', '750g carne molida + 600g frijol cocido + verduras · ~40g proteína por porción (sube a ~50g con 80g de cottage)', '🍲', 40, 24, 410, 18)");
+            long r10 = getLastInsertId(db);
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r10 + ", 'Carne molida (750g)', 750, 150, 0, 1450, 90)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r10 + ", 'Frijol cocido (600g)', 600, 45, 110, 675, 5)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r10 + ", 'Cebolla (1 pza)', 150, 1, 14, 60, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r10 + ", 'Ajo (3 dientes)', 10, 0, 2, 10, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r10 + ", 'Jitomate (3 pzas)', 300, 2, 12, 60, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r10 + ", 'Pimiento (1 pza)', 120, 1, 7, 30, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r10 + ", 'Calabacita (1 pza)', 150, 2, 6, 30, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r10 + ", 'Zanahoria (1 pza)', 70, 1, 7, 30, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r10 + ", 'Aceite (1 cda)', 14, 0, 0, 120, 14)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r10 + ", 'Caldo de res (1 taza)', 240, 1, 2, 15, 0)");
+
+            // 11. Muffins de huevo proteicos — 8pm (cena lista para calentar, 12 muffins)
+            db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Muffins de huevo proteicos', '8pm — Cena (meal prep)', '10 huevos + claras + pollo + panela + verduras, horneados · ~30g proteína por 3 piezas (sube a ~40g con cottage o kéfir)', '🧁', 30, 6, 280, 16)");
+            long r11 = getLastInsertId(db);
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r11 + ", 'Huevos (10 pzas)', 500, 60, 0, 700, 50)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r11 + ", 'Claras San Juan (200ml)', 200, 22, 0, 104, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r11 + ", 'Pollo deshebrado (150g)', 150, 45, 0, 248, 5)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r11 + ", 'Queso panela (100g)', 100, 18, 5, 225, 15)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r11 + ", 'Calabacita rallada (1 pza)', 150, 2, 6, 30, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r11 + ", 'Pimiento (1 pza)', 120, 1, 7, 30, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r11 + ", 'Cebolla (½ pza)', 75, 0, 7, 30, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r11 + ", 'Espinaca (50g)', 50, 1, 2, 12, 0)");
+
+            // 12. Tinga de pollo — 8pm (cena lista para calentar, sirve 5)
+            db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Tinga de pollo', '8pm — Cena (meal prep)', '750g pechuga deshebrada + salsa de jitomate y chipotle · ~40g proteína por porción · sirve con tortillas y cottage', '🌶️', 40, 8, 280, 8)");
+            long r12 = getLastInsertId(db);
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r12 + ", 'Pechuga de pollo (750g)', 750, 225, 0, 1240, 25)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r12 + ", 'Cebolla (1 pza)', 150, 1, 14, 60, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r12 + ", 'Jitomate (4 pzas)', 400, 3, 16, 80, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r12 + ", 'Chipotles en adobo (2 pzas)', 30, 0, 4, 20, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r12 + ", 'Ajo (2 dientes)', 7, 0, 1, 7, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r12 + ", 'Aceite (1 cda)', 14, 0, 0, 120, 14)");
+
+            // 13. Lentejas guisadas con chorizo de pavo — 8pm (cena lista para calentar, sirve 5)
+            db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG) VALUES ('Lentejas guisadas con chorizo de pavo', '8pm — Cena (meal prep)', '450g lentejas secas + chorizo de pavo + verduras · ~34g proteína por porción (sube a ~40g con huevo cocido o 80g de cottage)', '🍛', 34, 50, 420, 12)");
+            long r13 = getLastInsertId(db);
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r13 + ", 'Lentejas secas (450g)', 450, 117, 297, 1530, 5)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r13 + ", 'Chorizo de pavo (250g)', 250, 50, 5, 400, 25)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r13 + ", 'Cebolla (1 pza)', 150, 1, 14, 60, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r13 + ", 'Ajo (3 dientes)', 10, 0, 2, 10, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r13 + ", 'Jitomate (3 pzas)', 300, 2, 12, 60, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r13 + ", 'Zanahoria (1 pza)', 70, 1, 7, 30, 0)");
+            db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r13 + ", 'Caldo de pollo (1.5L)', 1500, 5, 10, 90, 0)");
+
+            // ── Frecuentes adicionales del Plan Maestro (PDF, cenas meal prep) ──
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Crema de cacahuate (1 cda / 16g)', 0, 3, 90, 8, 16)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Chorizo de pavo (100g)', 20, 2, 160, 10, 100)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Lentejas cocidas (150g)', 13, 33, 170, 0, 150)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Pechuga de pollo deshebrada (100g)', 30, 0, 165, 3, 100)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Picadillo de res y frijol (porción / 280g)', 40, 24, 410, 18, 280)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Muffin de huevo proteico (3 pzas / 180g)', 30, 6, 280, 16, 180)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Tinga de pollo (porción / 260g)', 40, 8, 280, 8, 260)");
+            db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG) VALUES ('Lentejas guisadas con chorizo (porción / 350g)', 34, 50, 420, 12, 350)");
         }
 
         private long getLastInsertId(SupportSQLiteDatabase db) {
