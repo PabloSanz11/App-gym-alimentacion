@@ -29,7 +29,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Planeación semanal (Lun-Vie)"
+                android:text="Calendario semanal (Lun-Vie)"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#1C1C1E"
@@ -38,7 +38,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Toca una celda para asignar un platillo a cada comida"
+                android:text="Toca una celda para asignar un platillo (con opción de aplicarlo a más días). Mantén presionada una celda y luego toca otra para intercambiarlas."
                 android:textSize="12sp"
                 android:textColor="#6C6C70"
                 android:layout_marginBottom="12dp" />

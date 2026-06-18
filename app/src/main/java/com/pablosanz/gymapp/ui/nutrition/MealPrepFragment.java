@@ -2,12 +2,14 @@ package com.pablosanz.gymapp.ui.nutrition;
 
 import android.app.AlertDialog;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +31,7 @@ import java.util.Map;
 public class MealPrepFragment extends Fragment {
 
     private static final String[] DAYS = {"Lunes", "Martes", "Miércoles", "Jueves", "Viernes"};
+    private static final String[] DAY_SHORT = {"Lun", "Mar", "Mié", "Jue", "Vie"};
     private static final String[] SLOTS = {"desayuno", "almuerzo", "merienda", "cena"};
     private static final String[] SLOT_LABELS = {"Desayuno", "Almuerzo", "Merienda", "Cena"};
 
@@ -36,6 +39,9 @@ public class MealPrepFragment extends Fragment {
     private NutritionRepository nutritionRepository;
     private final Map<String, MealPlanEntry> planMap = new HashMap<>();
     private List<Recipe> allRecipes = new ArrayList<>();
+
+    /** {day, slot} of a cell waiting to be swapped, or null if no swap in progress. */
+    private String[] swapPending;
 
     @Nullable
     @Override
@@ -75,68 +81,179 @@ public class MealPrepFragment extends Fragment {
     }
 
     private void buildGrid() {
+        swapPending = null;
         binding.layoutMealPlanGrid.removeAllViews();
-        for (String day : DAYS) {
-            TextView dayHeader = new TextView(requireContext());
-            dayHeader.setText(day);
-            dayHeader.setTextSize(14f);
-            dayHeader.setTypeface(null, android.graphics.Typeface.BOLD);
-            dayHeader.setTextColor(Color.parseColor("#1B3A6B"));
-            dayHeader.setPadding(0, dpToPx(12), 0, dpToPx(4));
-            binding.layoutMealPlanGrid.addView(dayHeader);
 
-            for (int i = 0; i < SLOTS.length; i++) {
-                String slot = SLOTS[i];
+        // Header row: corner + day abbreviations
+        LinearLayout headerRow = new LinearLayout(requireContext());
+        headerRow.setOrientation(LinearLayout.HORIZONTAL);
+        TextView corner = new TextView(requireContext());
+        corner.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(72), LinearLayout.LayoutParams.WRAP_CONTENT));
+        headerRow.addView(corner);
+        for (String dayShort : DAY_SHORT) {
+            TextView tv = new TextView(requireContext());
+            tv.setText(dayShort);
+            tv.setTextSize(12f);
+            tv.setTypeface(null, android.graphics.Typeface.BOLD);
+            tv.setTextColor(Color.parseColor("#1B3A6B"));
+            tv.setGravity(android.view.Gravity.CENTER);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+            tv.setLayoutParams(lp);
+            headerRow.addView(tv);
+        }
+        binding.layoutMealPlanGrid.addView(headerRow);
+
+        for (int s = 0; s < SLOTS.length; s++) {
+            String slot = SLOTS[s];
+
+            LinearLayout row = new LinearLayout(requireContext());
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+            row.setPadding(0, dpToPx(3), 0, dpToPx(3));
+
+            TextView slotLabel = new TextView(requireContext());
+            slotLabel.setText(SLOT_LABELS[s]);
+            slotLabel.setTextSize(12f);
+            slotLabel.setTextColor(Color.parseColor("#6C6C70"));
+            slotLabel.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(72), LinearLayout.LayoutParams.WRAP_CONTENT));
+            row.addView(slotLabel);
+
+            for (String day : DAYS) {
                 String key = day + "_" + slot;
                 MealPlanEntry existing = planMap.get(key);
 
-                LinearLayout row = new LinearLayout(requireContext());
-                row.setOrientation(LinearLayout.HORIZONTAL);
-                row.setGravity(android.view.Gravity.CENTER_VERTICAL);
-                row.setPadding(0, dpToPx(6), 0, dpToPx(6));
+                TextView cell = new TextView(requireContext());
+                cell.setGravity(android.view.Gravity.CENTER);
+                cell.setMinHeight(dpToPx(48));
+                cell.setTextSize(10f);
+                cell.setPadding(dpToPx(2), dpToPx(4), dpToPx(2), dpToPx(4));
+                cell.setMaxLines(3);
 
-                TextView tvSlot = new TextView(requireContext());
-                tvSlot.setText(SLOT_LABELS[i]);
-                tvSlot.setTextSize(13f);
-                tvSlot.setTextColor(Color.parseColor("#6C6C70"));
-                LinearLayout.LayoutParams slotParams = new LinearLayout.LayoutParams(
-                        dpToPx(90), LinearLayout.LayoutParams.WRAP_CONTENT);
-                tvSlot.setLayoutParams(slotParams);
+                LinearLayout.LayoutParams cellParams =
+                        new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+                cellParams.setMargins(dpToPx(2), dpToPx(2), dpToPx(2), dpToPx(2));
+                cell.setLayoutParams(cellParams);
 
-                TextView tvRecipe = new TextView(requireContext());
-                tvRecipe.setText(existing != null ? existing.getRecipeName() : "Tocar para asignar");
-                tvRecipe.setTextSize(14f);
-                tvRecipe.setTextColor(existing != null ? Color.parseColor("#1B3A6B") : Color.parseColor("#9CA3AF"));
-                tvRecipe.setTypeface(null, existing != null ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
-                LinearLayout.LayoutParams recipeParams = new LinearLayout.LayoutParams(
-                        0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-                tvRecipe.setLayoutParams(recipeParams);
+                updateCellAppearance(cell, existing, false);
 
-                row.addView(tvSlot);
-                row.addView(tvRecipe);
-                row.setOnClickListener(v -> showRecipePicker(day, slot, tvRecipe));
-                binding.layoutMealPlanGrid.addView(row);
+                final String fDay = day;
+                final String fSlot = slot;
+                cell.setOnClickListener(v -> onCellClick(fDay, fSlot, cell));
+                cell.setOnLongClickListener(v -> {
+                    onCellLongClick(fDay, fSlot, cell);
+                    return true;
+                });
+
+                row.addView(cell);
             }
+            binding.layoutMealPlanGrid.addView(row);
         }
     }
 
-    private void showRecipePicker(String day, String slot, TextView targetView) {
+    private void updateCellAppearance(TextView cell, MealPlanEntry existing, boolean highlighted) {
+        cell.setText(existing != null ? shortenRecipeName(existing.getRecipeName()) : "+");
+        cell.setTextColor(existing != null ? Color.WHITE : Color.parseColor("#9CA3AF"));
+        cell.setTypeface(null, existing != null ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
+
+        GradientDrawable bg = new GradientDrawable();
+        bg.setCornerRadius(dpToPx(8));
+        bg.setColor(existing != null ? Color.parseColor("#1B3A6B") : Color.parseColor("#F2F2F7"));
+        if (highlighted) {
+            bg.setStroke(dpToPx(2), Color.parseColor("#FF9500"));
+        }
+        cell.setBackground(bg);
+    }
+
+    private String shortenRecipeName(String name) {
+        if (name == null) return "";
+        return name.length() > 16 ? name.substring(0, 14) + "…" : name;
+    }
+
+    private void onCellClick(String day, String slot, TextView cell) {
+        if (swapPending != null) {
+            String[] pending = swapPending;
+            swapPending = null;
+            if (pending[0].equals(day) && pending[1].equals(slot)) {
+                buildGrid();
+                return;
+            }
+            swapCells(pending[0], pending[1], day, slot);
+            return;
+        }
+        showRecipePicker(day, slot);
+    }
+
+    private void onCellLongClick(String day, String slot, TextView cell) {
+        swapPending = new String[]{day, slot};
+        updateCellAppearance(cell, planMap.get(day + "_" + slot), true);
+        Toast.makeText(getContext(), "Selecciona otra comida para intercambiar", Toast.LENGTH_SHORT).show();
+    }
+
+    private void swapCells(String dayA, String slotA, String dayB, String slotB) {
+        MealPlanEntry a = planMap.get(dayA + "_" + slotA);
+        MealPlanEntry b = planMap.get(dayB + "_" + slotB);
+
+        Runnable applyToB = () -> {
+            if (a != null) {
+                nutritionRepository.setMealPlan(dayB, slotB, a.getRecipeId(), a.getRecipeName(),
+                        () -> requireActivity().runOnUiThread(this::loadPlanAndBuildGrid));
+            } else {
+                nutritionRepository.clearMealPlanSlot(dayB, slotB,
+                        () -> requireActivity().runOnUiThread(this::loadPlanAndBuildGrid));
+            }
+        };
+
+        if (b != null) {
+            nutritionRepository.setMealPlan(dayA, slotA, b.getRecipeId(), b.getRecipeName(), applyToB::run);
+        } else {
+            nutritionRepository.clearMealPlanSlot(dayA, slotA, applyToB::run);
+        }
+    }
+
+    private void showRecipePicker(String day, String slot) {
         String[] names = new String[allRecipes.size()];
         for (int i = 0; i < allRecipes.size(); i++) names[i] = allRecipes.get(i).getName();
 
         new AlertDialog.Builder(requireContext())
-                .setTitle("Asignar platillo")
+                .setTitle("Asignar " + slotLabel(slot) + " — " + day)
                 .setItems(names, (d, index) -> {
                     Recipe selected = allRecipes.get(index);
-                    nutritionRepository.setMealPlan(day, slot, selected.getId(), selected.getName(), () ->
-                            requireActivity().runOnUiThread(() -> {
-                                planMap.put(day + "_" + slot, new MealPlanEntry(day, slot, selected.getId(), selected.getName()));
-                                targetView.setText(selected.getName());
-                                targetView.setTextColor(Color.parseColor("#1B3A6B"));
-                                targetView.setTypeface(null, android.graphics.Typeface.BOLD);
-                            }));
+                    applyRecipeToDay(day, slot, selected);
+                    offerApplyToOtherDays(day, slot, selected);
                 })
                 .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private String slotLabel(String slot) {
+        for (int i = 0; i < SLOTS.length; i++) if (SLOTS[i].equals(slot)) return SLOT_LABELS[i];
+        return slot;
+    }
+
+    private void applyRecipeToDay(String day, String slot, Recipe recipe) {
+        nutritionRepository.setMealPlan(day, slot, recipe.getId(), recipe.getName(), () ->
+                requireActivity().runOnUiThread(() -> {
+                    if (binding == null) return;
+                    planMap.put(day + "_" + slot, new MealPlanEntry(day, slot, recipe.getId(), recipe.getName()));
+                    buildGrid();
+                }));
+    }
+
+    private void offerApplyToOtherDays(String currentDay, String slot, Recipe recipe) {
+        List<String> otherDays = new ArrayList<>();
+        for (String d : DAYS) if (!d.equals(currentDay)) otherDays.add(d);
+        boolean[] checked = new boolean[otherDays.size()];
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("¿Aplicar \"" + recipe.getName() + "\" también a otros días?")
+                .setMultiChoiceItems(otherDays.toArray(new String[0]), checked,
+                        (d, which, isChecked) -> checked[which] = isChecked)
+                .setPositiveButton("Aplicar", (d, w) -> {
+                    for (int i = 0; i < otherDays.size(); i++) {
+                        if (checked[i]) applyRecipeToDay(otherDays.get(i), slot, recipe);
+                    }
+                })
+                .setNegativeButton("No, gracias", null)
                 .show();
     }
 
