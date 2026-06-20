@@ -301,9 +301,13 @@ public class NutritionRepository {
                         totals.merge(fav.getName(), fav.getDefaultQuantityG(), Float::sum);
                     }
                 } else {
+                    Recipe recipe = recipeDao.getById(entry.getRecipeId());
+                    int servings = recipe != null ? Math.max(1, recipe.getServings()) : 1;
                     List<RecipeIngredient> ingredients = recipeIngredientDao.getByRecipeId(entry.getRecipeId());
                     for (RecipeIngredient ing : ingredients) {
-                        totals.merge(ing.getIngredientName(), ing.getQuantityG(), Float::sum);
+                        // Las cantidades del ingrediente son del batch completo; se dividen entre
+                        // las porciones para sumar solo la cantidad de la porción de este día.
+                        totals.merge(ing.getIngredientName(), ing.getQuantityG() / servings, Float::sum);
                     }
                 }
             }
