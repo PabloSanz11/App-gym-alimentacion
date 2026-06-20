@@ -1,5 +1,6 @@
 package com.pablosanz.gymapp.data.model;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -20,6 +21,7 @@ public class Recipe {
     /** "desayuno" | "almuerzo" | "merienda" | "cena" — usado para filtrar por horario en el calendario y el plan de comidas. */
     private String mealSlot;
     /** Número de porciones que rinde el batch (ej. "sirve 5"). Los totales de macros/ingredientes son del batch completo; se dividen entre este valor para obtener la porción de un día. */
+    @ColumnInfo(defaultValue = "1")
     private int servings = 1;
 
     public Recipe(String name, String category, String description, String imageEmoji,

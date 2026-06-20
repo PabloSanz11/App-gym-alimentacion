@@ -35,7 +35,7 @@ import java.util.concurrent.Executors;
         MealPlanEntry.class,
         ShoppingListItem.class,
         IngredientPriceInfo.class
-}, version = 12, exportSchema = false)
+}, version = 13, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract WorkoutSessionDao workoutSessionDao();
