@@ -93,6 +93,13 @@ public class RecipeDetailFragment extends Fragment {
                     editableIngredients.clear();
                     editableIngredients.addAll(ingredients);
                     binding.toolbarRecipeDetail.setTitle(recipe.getName());
+                    if (recipe.getServings() > 1) {
+                        binding.tvRecipeServingsHint.setText(String.format(
+                                "Receta de %d porciones · los macros mostrados son por porción (1 día)", recipe.getServings()));
+                        binding.tvRecipeServingsHint.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.tvRecipeServingsHint.setVisibility(View.GONE);
+                    }
                     ingredientAdapter.notifyDataSetChanged();
                     updateMacroSummary();
                 });
@@ -211,6 +218,14 @@ public class RecipeDetailFragment extends Fragment {
             cals += ing.getCaloriesKcal();
             fat += ing.getFatG();
         }
+        // Las cantidades de los ingredientes son del batch completo (ej. "sirve 5");
+        // se dividen entre el número de porciones para mostrar/registrar la porción de un día.
+        int servings = recipe != null ? Math.max(1, recipe.getServings()) : 1;
+        protein /= servings;
+        carbs /= servings;
+        cals /= servings;
+        fat /= servings;
+
         binding.tvRecipeCalories.setText(String.format("%.0f kcal", cals));
         binding.tvRecipeProtein.setText(String.format("P: %.0fg", protein));
         binding.tvRecipeCarbs.setText(String.format("C: %.0fg", carbs));
@@ -230,19 +245,21 @@ public class RecipeDetailFragment extends Fragment {
                 cals += ing.getCaloriesKcal();
                 fat += ing.getFatG();
             }
-            recipe.setTotalProteinG(protein);
-            recipe.setTotalCarbsG(carbs);
-            recipe.setTotalCaloriesKcal(cals);
-            recipe.setTotalFatG(fat);
+            int servings = Math.max(1, recipe.getServings());
+            recipe.setTotalProteinG(protein / servings);
+            recipe.setTotalCarbsG(carbs / servings);
+            recipe.setTotalCaloriesKcal(cals / servings);
+            recipe.setTotalFatG(fat / servings);
             nutritionRepository.updateRecipe(recipe);
         });
     }
 
     private void addToMeal(float protein, float carbs, float cals, float fat) {
         String name = recipe != null ? recipe.getName() : "Platillo";
+        int servings = recipe != null ? Math.max(1, recipe.getServings()) : 1;
         float totalQtyG = 0;
         for (RecipeIngredient ing : editableIngredients) totalQtyG += ing.getQuantityG();
-        final float qtyG = totalQtyG;
+        final float qtyG = totalQtyG / servings;
         nutritionRepository.getOrCreateMealLog(date, mealSlot, mealLog -> {
             FoodEntry entry = new FoodEntry(
                     mealLog.getId(), name, "",

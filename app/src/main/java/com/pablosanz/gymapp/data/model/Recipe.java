@@ -19,6 +19,8 @@ public class Recipe {
     private String prepSteps;
     /** "desayuno" | "almuerzo" | "merienda" | "cena" — usado para filtrar por horario en el calendario y el plan de comidas. */
     private String mealSlot;
+    /** Número de porciones que rinde el batch (ej. "sirve 5"). Los totales de macros/ingredientes son del batch completo; se dividen entre este valor para obtener la porción de un día. */
+    private int servings = 1;
 
     public Recipe(String name, String category, String description, String imageEmoji,
                   float totalProteinG, float totalCarbsG,
@@ -55,4 +57,6 @@ public class Recipe {
     public void setPrepSteps(String prepSteps) { this.prepSteps = prepSteps; }
     public String getMealSlot() { return mealSlot; }
     public void setMealSlot(String mealSlot) { this.mealSlot = mealSlot; }
+    public int getServings() { return servings; }
+    public void setServings(int servings) { this.servings = servings; }
 }

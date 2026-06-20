@@ -135,25 +135,31 @@ public class MealLogFragment extends Fragment {
         nutritionRepository.getMealPlanForDaySlot(day, mealSlot, entry -> requireActivity().runOnUiThread(() -> {
             if (binding == null || entry == null) return;
             binding.tvPreselectionName.setText(entry.getRecipeName());
-            nutritionRepository.getRecipeIngredients(entry.getRecipeId(), ingredients -> requireActivity().runOnUiThread(() -> {
-                if (binding == null) return;
-                float p = 0, c = 0, cal = 0, f = 0;
-                for (RecipeIngredient ing : ingredients) {
-                    p += ing.getProteinG();
-                    c += ing.getCarbsG();
-                    cal += ing.getCaloriesKcal();
-                    f += ing.getFatG();
-                }
-                binding.tvPreselectionMacros.setText(
-                        Math.round(cal) + " kcal · " + Math.round(p) + "g prot · " + Math.round(c) + "g carbs");
-            }));
+            nutritionRepository.getRecipeById(entry.getRecipeId(), recipe -> {
+                int servings = recipe != null ? Math.max(1, recipe.getServings()) : 1;
+                nutritionRepository.getRecipeIngredients(entry.getRecipeId(), ingredients -> requireActivity().runOnUiThread(() -> {
+                    if (binding == null) return;
+                    float p = 0, c = 0, cal = 0, f = 0;
+                    for (RecipeIngredient ing : ingredients) {
+                        p += ing.getProteinG();
+                        c += ing.getCarbsG();
+                        cal += ing.getCaloriesKcal();
+                        f += ing.getFatG();
+                    }
+                    p /= servings; c /= servings; cal /= servings; f /= servings;
+                    binding.tvPreselectionMacros.setText(
+                            Math.round(cal) + " kcal · " + Math.round(p) + "g prot · " + Math.round(c) + "g carbs");
+                }));
+            });
             binding.cardWeeklyPreselection.setVisibility(View.VISIBLE);
             binding.btnAddPreselection.setOnClickListener(v -> quickAddPreselection(entry));
         }));
     }
 
     private void quickAddPreselection(MealPlanEntry entry) {
-        nutritionRepository.getRecipeIngredients(entry.getRecipeId(), ingredients -> {
+        nutritionRepository.getRecipeById(entry.getRecipeId(), recipe -> {
+            int servings = recipe != null ? Math.max(1, recipe.getServings()) : 1;
+            nutritionRepository.getRecipeIngredients(entry.getRecipeId(), ingredients -> {
             float p = 0, c = 0, cal = 0, f = 0;
             for (RecipeIngredient ing : ingredients) {
                 p += ing.getProteinG();
@@ -161,7 +167,7 @@ public class MealLogFragment extends Fragment {
                 cal += ing.getCaloriesKcal();
                 f += ing.getFatG();
             }
-            final float protein = p, carbs = c, calories = cal, fat = f;
+            final float protein = p / servings, carbs = c / servings, calories = cal / servings, fat = f / servings;
             nutritionRepository.getOrCreateMealLog(date, mealSlot, mealLog -> {
                 FoodEntry foodEntry = new FoodEntry(
                         mealLog.getId(), entry.getRecipeName(), "",
@@ -176,6 +182,7 @@ public class MealLogFragment extends Fragment {
                     Toast.makeText(getContext(), entry.getRecipeName() + " agregado", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(requireView()).popBackStack();
                 });
+            });
             });
         });
     }

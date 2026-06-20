@@ -35,7 +35,7 @@ import java.util.concurrent.Executors;
         MealPlanEntry.class,
         ShoppingListItem.class,
         IngredientPriceInfo.class
-}, version = 11, exportSchema = false)
+}, version = 12, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract WorkoutSessionDao workoutSessionDao();
@@ -238,6 +238,7 @@ public abstract class AppDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r7b + ", 'Chipotles en adobo (3 pzas)', 45, 0, 6, 30, 1)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r7b + ", 'Arroz cocido (½ taza / 125g)', 125, 3, 28, 124, 0)");
             db.execSQL("UPDATE recipes SET prepSteps = '1. Mezcla la carne molida con el huevo, la avena molida, cebolla y ajo picados, comino y sal; forma las albóndigas.\n2. Licúa el jitomate, el chipotle, la cebolla y el ajo restantes para la salsa.\n3. Sella las albóndigas en una olla con aceite.\n4. Vierte la salsa y el caldo, hierve y cuece ~20 min hasta que espese.\n5. Sirve con ½ taza de arroz o tortillas. Guárdalas en su salsa para que se mantengan jugosas al recalentar.' WHERE id = " + r7b);
+            db.execSQL("UPDATE recipes SET servings = 5 WHERE id = " + r7b);
 
             // 8. Cena: Atún + queso panela — 8pm (opción A)
             // 1 lata atún + 80g panela → ~44g P, cero cocina
@@ -270,6 +271,7 @@ public abstract class AppDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r10 + ", 'Aceite (1 cda)', 14, 0, 0, 120, 14)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r10 + ", 'Caldo de res (1 taza)', 240, 1, 2, 15, 0)");
             db.execSQL("UPDATE recipes SET prepSteps = '1. Pica la cebolla, el ajo, el pimiento, la calabacita, la zanahoria y el jitomate.\n2. Sofríe la verdura en el aceite hasta que la cebolla esté transparente.\n3. Agrega la carne molida y dórala bien, deshaciendo los grumos.\n4. Incorpora el comino, paprika, orégano y sal, agrega el jitomate y el caldo.\n5. Reduce a fuego medio-bajo y cocina 15 min.\n6. Incorpora el frijol cocido, mezcla y cocina 5 min más. Porciona en 5 recipientes (sube a ~50g coronando con 80g de cottage al servir).' WHERE id = " + r10);
+            db.execSQL("UPDATE recipes SET servings = 5 WHERE id = " + r10);
 
             // 11. Muffins de huevo proteicos — 8pm (cena lista para calentar, 12 muffins)
             db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG, mealSlot) VALUES ('Muffins de huevo proteicos', '8pm — Cena (meal prep)', '10 huevos + claras + pollo + panela + verduras, horneados · ~30g proteína por 3 piezas (sube a ~40g con cottage o kéfir)', '🧁', 30, 6, 280, 16, 'cena')");
@@ -283,6 +285,7 @@ public abstract class AppDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r11 + ", 'Cebolla (½ pza)', 75, 0, 7, 30, 0)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r11 + ", 'Espinaca (50g)', 50, 1, 2, 12, 0)");
             db.execSQL("UPDATE recipes SET prepSteps = '1. Precalienta el horno a 180°C y engrasa un molde para 12 muffins.\n2. Bate los huevos con las claras y la sal.\n3. Reparte la calabacita rallada, el pimiento, la cebolla, la espinaca, el pollo deshebrado y el queso panela entre los moldes.\n4. Vierte la mezcla de huevo encima de cada molde hasta cubrir el relleno.\n5. Hornea 20-22 min o hasta que cuajen. Deja enfriar antes de desmoldar (sube a ~40g acompañando con 100g de cottage o 1 taza de kéfir).' WHERE id = " + r11);
+            db.execSQL("UPDATE recipes SET servings = 4 WHERE id = " + r11);
 
             // 12. Tinga de pollo — 8pm (cena lista para calentar, sirve 5)
             db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG, mealSlot) VALUES ('Tinga de pollo', '8pm — Cena (meal prep)', '750g pechuga deshebrada + salsa de jitomate y chipotle · ~40g proteína por porción · sirve con tortillas y cottage', '🌶️', 40, 8, 280, 8, 'cena')");
@@ -294,6 +297,7 @@ public abstract class AppDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r12 + ", 'Ajo (2 dientes)', 7, 0, 1, 7, 0)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r12 + ", 'Aceite (1 cda)', 14, 0, 0, 120, 14)");
             db.execSQL("UPDATE recipes SET prepSteps = '1. Cuece la pechuga de pollo en agua con sal hasta que esté bien cocida; deshébrala.\n2. Licúa el jitomate, el chipotle y el ajo hasta obtener una salsa.\n3. Acitrona la cebolla en rodajas con el aceite.\n4. Agrega la salsa y el laurel, deja hervir 8-10 min.\n5. Incorpora el pollo deshebrado y cocina 5 min más para que absorba el sabor. Sirve con 2-3 tortillas y queso cottage.' WHERE id = " + r12);
+            db.execSQL("UPDATE recipes SET servings = 5 WHERE id = " + r12);
 
             // 13. Lentejas guisadas con chorizo de pavo — 8pm (cena lista para calentar, sirve 5)
             db.execSQL("INSERT INTO recipes (name, category, description, imageEmoji, totalProteinG, totalCarbsG, totalCaloriesKcal, totalFatG, mealSlot) VALUES ('Lentejas guisadas con chorizo de pavo', '8pm — Cena (meal prep)', '450g lentejas secas + chorizo de pavo + verduras · ~34g proteína por porción (sube a ~40g con huevo cocido o 80g de cottage)', '🍛', 34, 50, 420, 12, 'cena')");
@@ -306,6 +310,7 @@ public abstract class AppDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r13 + ", 'Zanahoria (1 pza)', 70, 1, 7, 30, 0)");
             db.execSQL("INSERT INTO recipe_ingredients (recipeId, ingredientName, quantityG, proteinG, carbsG, caloriesKcal, fatG) VALUES (" + r13 + ", 'Caldo de pollo (1.5L)', 1500, 5, 10, 90, 0)");
             db.execSQL("UPDATE recipes SET prepSteps = '1. Dora el chorizo de pavo en una olla grande hasta que suelte su grasa.\n2. Sofríe la cebolla, el ajo y la zanahoria picados en la misma olla.\n3. Licúa el jitomate y agrégalo junto con el comino y la sal.\n4. Incorpora las lentejas secas y el caldo de pollo.\n5. Cocina a fuego medio-bajo ~35 min, hasta que las lentejas estén suaves, moviendo de vez en cuando. Porciona en 5 recipientes (sube a ~40g con un huevo cocido encima o 80g de cottage).' WHERE id = " + r13);
+            db.execSQL("UPDATE recipes SET servings = 5 WHERE id = " + r13);
 
             // ── Frecuentes adicionales del Plan Maestro (PDF, cenas meal prep) ──
             db.execSQL("INSERT INTO favorite_foods (name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG, mealSlot) VALUES ('Crema de cacahuate (1 cda / 16g)', 0, 3, 90, 8, 16, 'desayuno')");
