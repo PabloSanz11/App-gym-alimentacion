@@ -408,8 +408,11 @@ public class MealPrepFragment extends Fragment {
     }
 
     private void showShoppingList(List<ShoppingListItem> items) {
-        ShoppingListAdapter adapter = new ShoppingListAdapter(items, item ->
-                nutritionRepository.updateShoppingItem(item));
+        ShoppingListAdapter adapter = new ShoppingListAdapter(
+                item -> nutritionRepository.updateShoppingItem(item),
+                item -> ShoppingItemEditDialog.show(requireContext(), getLayoutInflater(), nutritionRepository, item,
+                        saved -> binding.rvShoppingList.getAdapter().notifyDataSetChanged()));
+        adapter.setItems(items);
         binding.rvShoppingList.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvShoppingList.setAdapter(adapter);
         binding.cardShoppingList.setVisibility(View.VISIBLE);

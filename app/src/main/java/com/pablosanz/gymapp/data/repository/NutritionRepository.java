@@ -9,6 +9,7 @@ import com.pablosanz.gymapp.data.api.RetrofitClient;
 import com.pablosanz.gymapp.data.db.AppDatabase;
 import com.pablosanz.gymapp.data.db.FavoriteFoodDao;
 import com.pablosanz.gymapp.data.db.FoodEntryDao;
+import com.pablosanz.gymapp.data.db.IngredientPriceInfoDao;
 import com.pablosanz.gymapp.data.db.MealLogDao;
 import com.pablosanz.gymapp.data.db.MealPlanDao;
 import com.pablosanz.gymapp.data.db.RecipeDao;
@@ -16,6 +17,7 @@ import com.pablosanz.gymapp.data.db.RecipeIngredientDao;
 import com.pablosanz.gymapp.data.db.ShoppingListDao;
 import com.pablosanz.gymapp.data.model.FavoriteFood;
 import com.pablosanz.gymapp.data.model.FoodEntry;
+import com.pablosanz.gymapp.data.model.IngredientPriceInfo;
 import com.pablosanz.gymapp.data.model.MealLog;
 import com.pablosanz.gymapp.data.model.MealPlanEntry;
 import com.pablosanz.gymapp.data.model.Recipe;
@@ -40,6 +42,7 @@ public class NutritionRepository {
     private final RecipeIngredientDao recipeIngredientDao;
     private final MealPlanDao mealPlanDao;
     private final ShoppingListDao shoppingListDao;
+    private final IngredientPriceInfoDao ingredientPriceInfoDao;
 
     public NutritionRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
@@ -50,6 +53,7 @@ public class NutritionRepository {
         recipeIngredientDao = db.recipeIngredientDao();
         mealPlanDao = db.mealPlanDao();
         shoppingListDao = db.shoppingListDao();
+        ingredientPriceInfoDao = db.ingredientPriceInfoDao();
     }
 
     public LiveData<List<MealLog>> getMealLogsByDate(String date) {
@@ -303,18 +307,47 @@ public class NutritionRepository {
                     }
                 }
             }
-            Map<String, Float> previousCosts = new LinkedHashMap<>();
+            Map<String, IngredientPriceInfo> remembered = new LinkedHashMap<>();
             for (ShoppingListItem existing : shoppingListDao.getAll()) {
-                previousCosts.put(existing.getIngredientName(), existing.getEstimatedCostMxn());
+                remembered.put(existing.getIngredientName(),
+                        new IngredientPriceInfo(existing.getIngredientName(), existing.getEstimatedCostMxn(), existing.getStore()));
+            }
+            for (IngredientPriceInfo info : ingredientPriceInfoDao.getAll()) {
+                remembered.putIfAbsent(info.getIngredientName(), info);
             }
             shoppingListDao.clearAll();
             List<ShoppingListItem> items = new ArrayList<>();
             for (Map.Entry<String, Float> e : totals.entrySet()) {
-                float cost = previousCosts.containsKey(e.getKey()) ? previousCosts.get(e.getKey()) : 0f;
-                items.add(new ShoppingListItem(e.getKey(), e.getValue(), false, cost));
+                IngredientPriceInfo info = remembered.get(e.getKey());
+                ShoppingListItem item = new ShoppingListItem(e.getKey(), e.getValue(), false,
+                        info != null ? info.getEstimatedCostMxn() : 0f);
+                if (info != null) item.setStore(info.getStore());
+                items.add(item);
             }
             if (!items.isEmpty()) shoppingListDao.insertAll(items);
             if (callback != null) callback.onResult(items, plan);
+        });
+    }
+
+    /** Guarda el precio y súper editados para un ingrediente, tanto en la lista actual como en la
+     *  memoria persistente usada para prellenar futuras listas. */
+    public void saveIngredientPriceInfo(String ingredientName, float estimatedCostMxn, String store, Runnable onDone) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            ingredientPriceInfoDao.upsert(new IngredientPriceInfo(ingredientName, estimatedCostMxn, store));
+            ShoppingListItem current = shoppingListDao.getByIngredientName(ingredientName);
+            if (current != null) {
+                current.setEstimatedCostMxn(estimatedCostMxn);
+                current.setStore(store);
+                shoppingListDao.update(current);
+            }
+            if (onDone != null) onDone.run();
+        });
+    }
+
+    public void updateShoppingItems(List<ShoppingListItem> items, Runnable onDone) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            for (ShoppingListItem item : items) shoppingListDao.update(item);
+            if (onDone != null) onDone.run();
         });
     }
 

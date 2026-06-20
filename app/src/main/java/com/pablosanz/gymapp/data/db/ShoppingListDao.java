@@ -20,6 +20,9 @@ public interface ShoppingListDao {
     @Query("SELECT * FROM shopping_list_items ORDER BY ingredientName ASC")
     List<ShoppingListItem> getAll();
 
+    @Query("SELECT * FROM shopping_list_items WHERE ingredientName = :ingredientName LIMIT 1")
+    ShoppingListItem getByIngredientName(String ingredientName);
+
     @Query("DELETE FROM shopping_list_items")
     void clearAll();
 }

@@ -15,6 +15,8 @@ public class ShoppingListItem {
     private boolean purchased;
     /** Costo estimado en MXN, editable por el usuario para ajustarlo al precio real. */
     private float estimatedCostMxn;
+    /** Súper donde se compra este ingrediente: "HEB" | "Walmart" | "Comer" | "Local" | null. */
+    private String store;
 
     @Ignore
     public ShoppingListItem(String ingredientName, float totalQuantityG, boolean purchased) {
@@ -38,4 +40,6 @@ public class ShoppingListItem {
     public void setPurchased(boolean purchased) { this.purchased = purchased; }
     public float getEstimatedCostMxn() { return estimatedCostMxn; }
     public void setEstimatedCostMxn(float estimatedCostMxn) { this.estimatedCostMxn = estimatedCostMxn; }
+    public String getStore() { return store; }
+    public void setStore(String store) { this.store = store; }
 }

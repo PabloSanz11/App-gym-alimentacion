@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.pablosanz.gymapp.data.model.ShoppingListItem;
 import com.pablosanz.gymapp.data.repository.NutritionRepository;
 import com.pablosanz.gymapp.databinding.FragmentShoppingBinding;
+import com.pablosanz.gymapp.ui.nutrition.ShoppingItemEditDialog;
 import com.pablosanz.gymapp.ui.nutrition.ShoppingListAdapter;
 
 import java.util.ArrayList;
@@ -39,14 +40,18 @@ public class ShoppingFragment extends Fragment {
 
         nutritionRepository = new NutritionRepository(requireActivity().getApplication());
 
-        adapter = new ShoppingListAdapter(items, item -> {
-            nutritionRepository.updateShoppingItem(item);
-            updateSummary();
-        });
+        adapter = new ShoppingListAdapter(
+                item -> updateSummary(),
+                item -> ShoppingItemEditDialog.show(
+                        requireContext(), getLayoutInflater(), nutritionRepository, item, saved -> {
+                            adapter.setItems(items);
+                            updateSummary();
+                        }));
         binding.rvShopping.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvShopping.setAdapter(adapter);
 
         binding.btnResetShopping.setOnClickListener(v -> resetAll());
+        binding.btnSaveShopping.setOnClickListener(v -> saveAll());
 
         loadShoppingList();
     }
@@ -62,8 +67,15 @@ public class ShoppingFragment extends Fragment {
             if (binding == null) return;
             items.clear();
             items.addAll(loaded);
-            adapter.notifyDataSetChanged();
+            adapter.setItems(items);
             updateSummary();
+        }));
+    }
+
+    private void saveAll() {
+        nutritionRepository.updateShoppingItems(new ArrayList<>(items), () -> requireActivity().runOnUiThread(() -> {
+            if (getContext() == null) return;
+            android.widget.Toast.makeText(getContext(), "Lista guardada", android.widget.Toast.LENGTH_SHORT).show();
         }));
     }
 
@@ -92,9 +104,9 @@ public class ShoppingFragment extends Fragment {
     private void resetAll() {
         for (ShoppingListItem item : items) {
             item.setPurchased(false);
-            nutritionRepository.updateShoppingItem(item);
         }
-        adapter.notifyDataSetChanged();
+        nutritionRepository.updateShoppingItems(new ArrayList<>(items), null);
+        adapter.setItems(items);
         updateSummary();
     }
 

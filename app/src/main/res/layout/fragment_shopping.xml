@@ -131,6 +131,16 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipToPadding="false"
+        android:paddingHorizontal="20dp"
         android:paddingBottom="16dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_save_shopping"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Guardar lista"
+        app:backgroundTint="@color/colorPrimary"
+        android:textColor="@color/white" />
 
 </LinearLayout>

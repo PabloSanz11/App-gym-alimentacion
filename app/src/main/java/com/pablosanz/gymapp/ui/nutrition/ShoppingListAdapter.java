@@ -1,12 +1,9 @@
 package com.pablosanz.gymapp.ui.nutrition;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,83 +11,125 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.pablosanz.gymapp.R;
 import com.pablosanz.gymapp.data.model.ShoppingListItem;
+import com.pablosanz.gymapp.util.IngredientCategorizer;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ViewHolder> {
+public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_ITEM = 1;
 
     public interface OnItemToggled {
         void onToggled(ShoppingListItem item);
     }
 
-    private final List<ShoppingListItem> items;
-    private final OnItemToggled listener;
+    public interface OnItemEdit {
+        void onEdit(ShoppingListItem item);
+    }
 
-    public ShoppingListAdapter(List<ShoppingListItem> items, OnItemToggled listener) {
-        this.items = items;
-        this.listener = listener;
+    /** Cada elemento es un String (encabezado de categoría) o un ShoppingListItem. */
+    private final List<Object> rows = new ArrayList<>();
+    private final OnItemToggled toggleListener;
+    private final OnItemEdit editListener;
+
+    public ShoppingListAdapter(OnItemToggled toggleListener, OnItemEdit editListener) {
+        this.toggleListener = toggleListener;
+        this.editListener = editListener;
+    }
+
+    public void setItems(List<ShoppingListItem> items) {
+        rows.clear();
+        Map<String, List<ShoppingListItem>> grouped = new LinkedHashMap<>();
+        for (String category : IngredientCategorizer.CATEGORY_ORDER) grouped.put(category, new ArrayList<>());
+        for (ShoppingListItem item : items) {
+            grouped.get(IngredientCategorizer.categorize(item.getIngredientName())).add(item);
+        }
+        for (Map.Entry<String, List<ShoppingListItem>> entry : grouped.entrySet()) {
+            if (entry.getValue().isEmpty()) continue;
+            rows.add(entry.getKey());
+            rows.addAll(entry.getValue());
+        }
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return rows.get(position) instanceof String ? TYPE_HEADER : TYPE_ITEM;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == TYPE_HEADER) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_shopping_category_header, parent, false);
+            return new HeaderViewHolder(v);
+        }
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_shopping_list, parent, false);
-        return new ViewHolder(v);
+        return new ItemViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder h, int position) {
-        ShoppingListItem item = items.get(position);
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof HeaderViewHolder) {
+            ((HeaderViewHolder) holder).tvHeader.setText((String) rows.get(position));
+            return;
+        }
+        ShoppingListItem item = (ShoppingListItem) rows.get(position);
+        ItemViewHolder h = (ItemViewHolder) holder;
+
         h.tvName.setText(item.getIngredientName());
         h.tvQty.setText(String.format("%.0fg", item.getTotalQuantityG()));
+        h.tvCost.setText(item.getEstimatedCostMxn() > 0
+                ? String.format("$%.0f", item.getEstimatedCostMxn()) : "—");
+
+        if (item.getStore() != null) {
+            h.tvStore.setText(item.getStore());
+            h.tvStore.setVisibility(View.VISIBLE);
+        } else {
+            h.tvStore.setVisibility(View.GONE);
+        }
+
         h.checkBox.setOnCheckedChangeListener(null);
         h.checkBox.setChecked(item.isPurchased());
         h.checkBox.setOnCheckedChangeListener((btn, checked) -> {
             item.setPurchased(checked);
-            listener.onToggled(item);
+            if (toggleListener != null) toggleListener.onToggled(item);
         });
 
-        if (h.costWatcher != null) h.etCost.removeTextChangedListener(h.costWatcher);
-        h.etCost.setText(item.getEstimatedCostMxn() > 0
-                ? trimTrailingZero(item.getEstimatedCostMxn()) : "");
-        h.costWatcher = new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {
-                float cost;
-                try {
-                    cost = s.length() > 0 ? Float.parseFloat(s.toString()) : 0f;
-                } catch (NumberFormatException e) {
-                    return;
-                }
-                item.setEstimatedCostMxn(cost);
-                listener.onToggled(item);
-            }
-        };
-        h.etCost.addTextChangedListener(h.costWatcher);
-    }
-
-    private String trimTrailingZero(float value) {
-        return value == Math.floor(value) ? String.valueOf((int) value) : String.valueOf(value);
+        h.btnEdit.setOnClickListener(v -> {
+            if (editListener != null) editListener.onEdit(item);
+        });
     }
 
     @Override
-    public int getItemCount() { return items.size(); }
+    public int getItemCount() { return rows.size(); }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class HeaderViewHolder extends RecyclerView.ViewHolder {
+        TextView tvHeader;
+        HeaderViewHolder(@NonNull View v) {
+            super(v);
+            tvHeader = (TextView) v;
+        }
+    }
+
+    static class ItemViewHolder extends RecyclerView.ViewHolder {
         CheckBox checkBox;
-        TextView tvName, tvQty;
-        EditText etCost;
-        TextWatcher costWatcher;
+        TextView tvName, tvQty, tvCost, tvStore, btnEdit;
 
-        ViewHolder(@NonNull View v) {
+        ItemViewHolder(@NonNull View v) {
             super(v);
             checkBox = v.findViewById(R.id.cb_shopping_item);
             tvName = v.findViewById(R.id.tv_shopping_item_name);
             tvQty = v.findViewById(R.id.tv_shopping_item_qty);
-            etCost = v.findViewById(R.id.et_shopping_item_cost);
+            tvCost = v.findViewById(R.id.tv_shopping_item_cost);
+            tvStore = v.findViewById(R.id.tv_shopping_item_store);
+            btnEdit = v.findViewById(R.id.btn_edit_shopping_item);
         }
     }
 }
