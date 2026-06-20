@@ -1,6 +1,7 @@
 package com.pablosanz.gymapp.data.model;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "shopping_list_items")
@@ -15,6 +16,7 @@ public class ShoppingListItem {
     /** Costo estimado en MXN, editable por el usuario para ajustarlo al precio real. */
     private float estimatedCostMxn;
 
+    @Ignore
     public ShoppingListItem(String ingredientName, float totalQuantityG, boolean purchased) {
         this(ingredientName, totalQuantityG, purchased, 0f);
     }

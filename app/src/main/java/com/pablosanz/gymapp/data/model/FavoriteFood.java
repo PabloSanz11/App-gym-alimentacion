@@ -1,6 +1,7 @@
 package com.pablosanz.gymapp.data.model;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "favorite_foods")
@@ -16,8 +17,10 @@ public class FavoriteFood {
     /** "desayuno" | "almuerzo" | "merienda" | "cena" | null (disponible para cualquier comida). */
     private String mealSlot;
 
+    @Ignore
     public FavoriteFood() {}
 
+    @Ignore
     public FavoriteFood(String name, float proteinG, float carbsG, float caloriesKcal, float fatG, float defaultQuantityG) {
         this(name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG, null);
     }
