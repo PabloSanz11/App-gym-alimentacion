@@ -298,7 +298,7 @@ public class NutritionRepository {
                 if (entry.getFavoriteFoodId() > 0) {
                     FavoriteFood fav = favoriteFoodDao.getById(entry.getFavoriteFoodId());
                     if (fav != null) {
-                        totals.merge(fav.getName(), fav.getDefaultQuantityG(), Float::sum);
+                        totals.merge(cleanIngredientName(fav.getName()), fav.getDefaultQuantityG(), Float::sum);
                     }
                 } else {
                     Recipe recipe = recipeDao.getById(entry.getRecipeId());
@@ -307,7 +307,9 @@ public class NutritionRepository {
                     for (RecipeIngredient ing : ingredients) {
                         // Las cantidades del ingrediente son del batch completo; se dividen entre
                         // las porciones para sumar solo la cantidad de la porción de este día.
-                        totals.merge(ing.getIngredientName(), ing.getQuantityG() / servings, Float::sum);
+                        // El nombre se limpia del paréntesis de la receta original (ej. "(900g)")
+                        // porque ya no corresponde a la cantidad real a comprar.
+                        totals.merge(cleanIngredientName(ing.getIngredientName()), ing.getQuantityG() / servings, Float::sum);
                     }
                 }
             }
@@ -331,6 +333,13 @@ public class NutritionRepository {
             if (!items.isEmpty()) shoppingListDao.insertAll(items);
             if (callback != null) callback.onResult(items, plan);
         });
+    }
+
+    /** Quita el paréntesis descriptivo de la receta original (ej. "Carne molida (900g)" -> "Carne molida"),
+     *  ya que esa cantidad es del batch de la receta y no la cantidad real a comprar para la semana. */
+    private static String cleanIngredientName(String name) {
+        if (name == null) return name;
+        return name.replaceAll("\\s*\\([^)]*\\)\\s*$", "").trim();
     }
 
     /** Guarda el precio y súper editados para un ingrediente, tanto en la lista actual como en la

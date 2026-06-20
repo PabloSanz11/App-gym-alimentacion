@@ -84,7 +84,10 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         ItemViewHolder h = (ItemViewHolder) holder;
 
         h.tvName.setText(item.getIngredientName());
-        h.tvQty.setText(String.format("%.0fg", item.getTotalQuantityG()));
+        float qty = item.getTotalQuantityG();
+        h.tvQty.setText(qty >= 1000
+                ? String.format("%.2fkg", qty / 1000f)
+                : String.format("%.0fg", qty));
         h.tvCost.setText(item.getEstimatedCostMxn() > 0
                 ? String.format("$%.0f", item.getEstimatedCostMxn()) : "—");
 
