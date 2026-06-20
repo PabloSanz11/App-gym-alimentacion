@@ -23,10 +23,18 @@ public class EditableIngredientAdapter extends RecyclerView.Adapter<EditableIngr
 
     private final List<RecipeIngredient> items;
     private final OnChangeListener listener;
+    private int servings = 1;
 
     public EditableIngredientAdapter(List<RecipeIngredient> items, OnChangeListener listener) {
         this.items = items;
         this.listener = listener;
+    }
+
+    /** Las cantidades de los ingredientes se guardan por el batch completo; se dividen
+     * entre este valor para mostrar y editar la porción de un día. */
+    public void setServings(int servings) {
+        this.servings = Math.max(1, servings);
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -46,9 +54,17 @@ public class EditableIngredientAdapter extends RecyclerView.Adapter<EditableIngr
         holder.etQty.removeTextChangedListener(holder.qtyWatcher);
 
         holder.etName.setText(ing.getIngredientName());
-        holder.etQty.setText(String.valueOf((int) ing.getQuantityG()));
+        // Las cantidades/macros del ingrediente son del batch completo; se muestran
+        // divididas entre las porciones para reflejar la cantidad de un día.
+        float displayQty = ing.getQuantityG() / servings;
+        float displayProtein = ing.getProteinG() / servings;
+        float displayCarbs = ing.getCarbsG() / servings;
+        float displayCals = ing.getCaloriesKcal() / servings;
+        float displayFat = ing.getFatG() / servings;
 
-        // Original macros per gram (stored at original quantity)
+        holder.etQty.setText(String.valueOf((int) displayQty));
+
+        // Macros por gramo (en base a la cantidad del batch, no de la porción mostrada)
         float origQty = ing.getQuantityG() > 0 ? ing.getQuantityG() : 1;
         float proteinPer = ing.getProteinG() / origQty;
         float carbsPer = ing.getCarbsG() / origQty;
@@ -56,7 +72,7 @@ public class EditableIngredientAdapter extends RecyclerView.Adapter<EditableIngr
         float fatPer = ing.getFatG() / origQty;
 
         holder.tvMacros.setText(String.format("P:%.0f C:%.0f %.0fkcal",
-                ing.getProteinG(), ing.getCarbsG(), ing.getCaloriesKcal()));
+                displayProtein, displayCarbs, displayCals));
 
         holder.nameWatcher = new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
@@ -76,15 +92,16 @@ public class EditableIngredientAdapter extends RecyclerView.Adapter<EditableIngr
                 int pos = holder.getAdapterPosition();
                 if (pos == RecyclerView.NO_ID) return;
                 try {
-                    float newQty = Float.parseFloat(s.toString());
+                    float newDisplayQty = Float.parseFloat(s.toString());
+                    float newBatchQty = newDisplayQty * servings;
                     RecipeIngredient i = items.get(pos);
-                    i.setQuantityG(newQty);
-                    i.setProteinG(proteinPer * newQty);
-                    i.setCarbsG(carbsPer * newQty);
-                    i.setCaloriesKcal(calsPer * newQty);
-                    i.setFatG(fatPer * newQty);
+                    i.setQuantityG(newBatchQty);
+                    i.setProteinG(proteinPer * newBatchQty);
+                    i.setCarbsG(carbsPer * newBatchQty);
+                    i.setCaloriesKcal(calsPer * newBatchQty);
+                    i.setFatG(fatPer * newBatchQty);
                     holder.tvMacros.setText(String.format("P:%.0f C:%.0f %.0fkcal",
-                            i.getProteinG(), i.getCarbsG(), i.getCaloriesKcal()));
+                            i.getProteinG() / servings, i.getCarbsG() / servings, i.getCaloriesKcal() / servings));
                     listener.onChange();
                 } catch (NumberFormatException ignored) {}
             }

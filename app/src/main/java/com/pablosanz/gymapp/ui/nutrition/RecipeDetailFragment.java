@@ -100,7 +100,7 @@ public class RecipeDetailFragment extends Fragment {
                     } else {
                         binding.tvRecipeServingsHint.setVisibility(View.GONE);
                     }
-                    ingredientAdapter.notifyDataSetChanged();
+                    ingredientAdapter.setServings(recipe.getServings());
                     updateMacroSummary();
                 });
             });
