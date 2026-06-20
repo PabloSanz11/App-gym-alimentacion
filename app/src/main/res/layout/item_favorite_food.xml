@@ -2,19 +2,29 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="160dp"
+    android:layout_width="148dp"
     android:layout_height="wrap_content"
     android:layout_marginEnd="10dp"
-    app:cardCornerRadius="12dp"
+    app:cardCornerRadius="14dp"
     app:cardElevation="0dp"
+    app:cardBackgroundColor="#F8F9FC"
     app:strokeColor="@color/colorPrimary"
-    app:strokeWidth="1.5dp">
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tv_fav_emoji"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:background="@drawable/bg_favorite_icon"
+            android:layout_marginBottom="8dp" />
 
         <TextView
             android:id="@+id/tv_fav_name"
@@ -32,7 +42,7 @@
             android:layout_height="wrap_content"
             android:textSize="11sp"
             android:textColor="@color/text_secondary"
-            android:layout_marginTop="4dp" />
+            android:layout_marginTop="6dp" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

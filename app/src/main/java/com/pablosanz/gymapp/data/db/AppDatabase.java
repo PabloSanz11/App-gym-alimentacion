@@ -76,15 +76,24 @@ public abstract class AppDatabase extends RoomDatabase {
             seedData(db);
         }
 
+        // Total recipes inserted by seedData(); used to detect a partial/incomplete seed
+        // (e.g. a previous run that crashed mid-insert) and not just a fully empty table.
+        private static final int EXPECTED_RECIPE_COUNT = 13;
+
         @Override
         public void onOpen(@NonNull SupportSQLiteDatabase db) {
             super.onOpen(db);
             databaseWriteExecutor.execute(() -> {
-                boolean empty = false;
+                int count = 0;
                 try (android.database.Cursor cursor = db.query("SELECT COUNT(*) FROM recipes")) {
-                    if (cursor.moveToFirst() && cursor.getInt(0) == 0) empty = true;
+                    if (cursor.moveToFirst()) count = cursor.getInt(0);
                 }
-                if (empty) seedData(db);
+                if (count < EXPECTED_RECIPE_COUNT) {
+                    db.execSQL("DELETE FROM recipes");
+                    db.execSQL("DELETE FROM recipe_ingredients");
+                    db.execSQL("DELETE FROM favorite_foods");
+                    seedData(db);
+                }
             });
         }
 

@@ -38,6 +38,7 @@ public class FavoriteFoodAdapter extends RecyclerView.Adapter<FavoriteFoodAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         FavoriteFood food = items.get(position);
+        holder.tvEmoji.setText(emojiFor(food.getName()));
         holder.tvName.setText(food.getName());
         holder.tvMacros.setText(String.format("%.0f kcal · P:%.0fg", food.getCaloriesKcal(), food.getProteinG()));
         holder.itemView.setOnClickListener(v -> listener.onClick(food));
@@ -46,10 +47,36 @@ public class FavoriteFoodAdapter extends RecyclerView.Adapter<FavoriteFoodAdapte
     @Override
     public int getItemCount() { return items.size(); }
 
+    private String emojiFor(String name) {
+        String n = name.toLowerCase();
+        if (n.contains("pollo")) return "🍗";
+        if (n.contains("carne") || n.contains("res")) return "🥩";
+        if (n.contains("frijol") || n.contains("lenteja")) return "🫘";
+        if (n.contains("huevo") || n.contains("clara")) return "🥚";
+        if (n.contains("cottage") || n.contains("panela") || n.contains("queso")) return "🧀";
+        if (n.contains("atún") || n.contains("atun")) return "🐟";
+        if (n.contains("totopo") || n.contains("tortilla")) return "🌽";
+        if (n.contains("salsa")) return "🌶️";
+        if (n.contains("aguacate")) return "🥑";
+        if (n.contains("kéfir") || n.contains("kefir") || n.contains("leche")) return "🥛";
+        if (n.contains("proteína") || n.contains("proteina") || n.contains("whey")) return "🥤";
+        if (n.contains("arroz")) return "🍚";
+        if (n.contains("camote") || n.contains("papa")) return "🍠";
+        if (n.contains("pasta")) return "🍝";
+        if (n.contains("avena")) return "🥣";
+        if (n.contains("plátano") || n.contains("platano") || n.contains("fruta")) return "🍌";
+        if (n.contains("verdura") || n.contains("ensalada")) return "🥗";
+        if (n.contains("nuez") || n.contains("nueces")) return "🥜";
+        if (n.contains("crema de cacahuate")) return "🥜";
+        if (n.contains("chorizo")) return "🌭";
+        return "🍽️";
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvMacros;
+        TextView tvEmoji, tvName, tvMacros;
         ViewHolder(@NonNull View itemView) {
             super(itemView);
+            tvEmoji = itemView.findViewById(R.id.tv_fav_emoji);
             tvName = itemView.findViewById(R.id.tv_fav_name);
             tvMacros = itemView.findViewById(R.id.tv_fav_macros);
         }
