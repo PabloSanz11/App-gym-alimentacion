@@ -73,7 +73,13 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
-            seedData(db);
+            db.beginTransaction();
+            try {
+                seedData(db);
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
         }
 
         // Total recipes inserted by seedData(); used to detect a partial/incomplete seed
@@ -89,10 +95,21 @@ public abstract class AppDatabase extends RoomDatabase {
                     if (cursor.moveToFirst()) count = cursor.getInt(0);
                 }
                 if (count < EXPECTED_RECIPE_COUNT) {
-                    db.execSQL("DELETE FROM recipes");
-                    db.execSQL("DELETE FROM recipe_ingredients");
-                    db.execSQL("DELETE FROM favorite_foods");
-                    seedData(db);
+                    // Run inside a single transaction so every statement (including the
+                    // last_insert_rowid() lookups in seedData) is pinned to the same
+                    // connection — Room's WAL read-connection pool can otherwise route
+                    // queries to a connection that never saw the INSERT, returning a
+                    // stale/zero rowid and triggering FK violations on the next insert.
+                    db.beginTransaction();
+                    try {
+                        db.execSQL("DELETE FROM recipe_ingredients");
+                        db.execSQL("DELETE FROM recipes");
+                        db.execSQL("DELETE FROM favorite_foods");
+                        seedData(db);
+                        db.setTransactionSuccessful();
+                    } finally {
+                        db.endTransaction();
+                    }
                 }
             });
         }
