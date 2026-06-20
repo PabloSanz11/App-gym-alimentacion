@@ -13,16 +13,23 @@ public class FavoriteFood {
     private float caloriesKcal;
     private float fatG;
     private float defaultQuantityG;
+    /** "desayuno" | "almuerzo" | "merienda" | "cena" | null (disponible para cualquier comida). */
+    private String mealSlot;
 
     public FavoriteFood() {}
 
     public FavoriteFood(String name, float proteinG, float carbsG, float caloriesKcal, float fatG, float defaultQuantityG) {
+        this(name, proteinG, carbsG, caloriesKcal, fatG, defaultQuantityG, null);
+    }
+
+    public FavoriteFood(String name, float proteinG, float carbsG, float caloriesKcal, float fatG, float defaultQuantityG, String mealSlot) {
         this.name = name;
         this.proteinG = proteinG;
         this.carbsG = carbsG;
         this.caloriesKcal = caloriesKcal;
         this.fatG = fatG;
         this.defaultQuantityG = defaultQuantityG;
+        this.mealSlot = mealSlot;
     }
 
     public long getId() { return id; }
@@ -39,4 +46,6 @@ public class FavoriteFood {
     public void setFatG(float fatG) { this.fatG = fatG; }
     public float getDefaultQuantityG() { return defaultQuantityG; }
     public void setDefaultQuantityG(float defaultQuantityG) { this.defaultQuantityG = defaultQuantityG; }
+    public String getMealSlot() { return mealSlot; }
+    public void setMealSlot(String mealSlot) { this.mealSlot = mealSlot; }
 }

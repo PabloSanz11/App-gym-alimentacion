@@ -148,6 +148,29 @@ public class NutritionRepository {
         });
     }
 
+    public void searchRecipesByMealSlot(String mealSlot, String query, OnRecipesCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Recipe> recipes = (query == null || query.isEmpty())
+                    ? recipeDao.getByMealSlot(mealSlot)
+                    : recipeDao.searchByMealSlot(mealSlot, query);
+            if (callback != null) callback.onResult(recipes);
+        });
+    }
+
+    public void getRecipesByMealSlot(String mealSlot, OnRecipesCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Recipe> recipes = recipeDao.getByMealSlot(mealSlot);
+            if (callback != null) callback.onResult(recipes);
+        });
+    }
+
+    public void getFavoriteFoodsByMealSlot(String mealSlot, OnFavoriteFoodsCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<FavoriteFood> foods = favoriteFoodDao.getByMealSlot(mealSlot);
+            if (callback != null) callback.onResult(foods);
+        });
+    }
+
     public void getRecipeById(long id, OnRecipeCallback callback) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             Recipe recipe = recipeDao.getById(id);
@@ -227,9 +250,24 @@ public class NutritionRepository {
         });
     }
 
+    public void setMealPlanFavorite(String day, String slot, long favoriteFoodId, String favoriteFoodName, Runnable onDone) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            mealPlanDao.insert(MealPlanEntry.forFavorite(day, slot, favoriteFoodId, favoriteFoodName));
+            if (onDone != null) onDone.run();
+        });
+    }
+
     public void clearMealPlanSlot(String day, String slot, Runnable onDone) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             mealPlanDao.clearSlot(day, slot);
+            if (onDone != null) onDone.run();
+        });
+    }
+
+    public void clearWeekPlan(Runnable onDone) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            mealPlanDao.clearAll();
+            shoppingListDao.clearAll();
             if (onDone != null) onDone.run();
         });
     }
@@ -253,15 +291,27 @@ public class NutritionRepository {
             List<MealPlanEntry> plan = mealPlanDao.getAll();
             Map<String, Float> totals = new LinkedHashMap<>();
             for (MealPlanEntry entry : plan) {
-                List<RecipeIngredient> ingredients = recipeIngredientDao.getByRecipeId(entry.getRecipeId());
-                for (RecipeIngredient ing : ingredients) {
-                    totals.merge(ing.getIngredientName(), ing.getQuantityG(), Float::sum);
+                if (entry.getFavoriteFoodId() > 0) {
+                    FavoriteFood fav = favoriteFoodDao.getById(entry.getFavoriteFoodId());
+                    if (fav != null) {
+                        totals.merge(fav.getName(), fav.getDefaultQuantityG(), Float::sum);
+                    }
+                } else {
+                    List<RecipeIngredient> ingredients = recipeIngredientDao.getByRecipeId(entry.getRecipeId());
+                    for (RecipeIngredient ing : ingredients) {
+                        totals.merge(ing.getIngredientName(), ing.getQuantityG(), Float::sum);
+                    }
                 }
+            }
+            Map<String, Float> previousCosts = new LinkedHashMap<>();
+            for (ShoppingListItem existing : shoppingListDao.getAll()) {
+                previousCosts.put(existing.getIngredientName(), existing.getEstimatedCostMxn());
             }
             shoppingListDao.clearAll();
             List<ShoppingListItem> items = new ArrayList<>();
             for (Map.Entry<String, Float> e : totals.entrySet()) {
-                items.add(new ShoppingListItem(e.getKey(), e.getValue(), false));
+                float cost = previousCosts.containsKey(e.getKey()) ? previousCosts.get(e.getKey()) : 0f;
+                items.add(new ShoppingListItem(e.getKey(), e.getValue(), false, cost));
             }
             if (!items.isEmpty()) shoppingListDao.insertAll(items);
             if (callback != null) callback.onResult(items, plan);

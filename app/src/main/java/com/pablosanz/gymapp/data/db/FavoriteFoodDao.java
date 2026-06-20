@@ -23,4 +23,10 @@ public interface FavoriteFoodDao {
 
     @Query("SELECT * FROM favorite_foods ORDER BY name ASC")
     List<FavoriteFood> getAll();
+
+    @Query("SELECT * FROM favorite_foods WHERE mealSlot = :mealSlot OR mealSlot IS NULL ORDER BY name ASC")
+    List<FavoriteFood> getByMealSlot(String mealSlot);
+
+    @Query("SELECT * FROM favorite_foods WHERE id = :id LIMIT 1")
+    FavoriteFood getById(long id);
 }

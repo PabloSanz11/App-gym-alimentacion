@@ -26,6 +26,27 @@
         android:layout_height="wrap_content"
         android:textSize="13sp"
         android:textStyle="bold"
-        android:textColor="@color/colorPrimary" />
+        android:textColor="@color/colorPrimary"
+        android:layout_marginEnd="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="$"
+        android:textSize="14sp"
+        android:textColor="#6C6C70" />
+
+    <EditText
+        android:id="@+id/et_shopping_item_cost"
+        android:layout_width="64dp"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:textSize="14sp"
+        android:textColor="#1C1C1E"
+        android:gravity="end"
+        android:hint="0"
+        android:maxLines="1"
+        android:imeOptions="actionDone"
+        android:padding="4dp" />
 
 </LinearLayout>

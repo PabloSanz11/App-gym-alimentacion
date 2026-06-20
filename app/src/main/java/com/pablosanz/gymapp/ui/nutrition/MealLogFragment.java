@@ -90,7 +90,7 @@ public class MealLogFragment extends Fragment {
         binding.rvRecipes.setLayoutManager(
                 new androidx.recyclerview.widget.GridLayoutManager(getContext(), 2));
         binding.rvRecipes.setAdapter(recipeGridAdapter);
-        nutritionRepository.getAllRecipes(recipes -> requireActivity().runOnUiThread(() -> {
+        nutritionRepository.getRecipesByMealSlot(mealSlot, recipes -> requireActivity().runOnUiThread(() -> {
             if (binding == null) return;
             recipeGridAdapter.setItems(recipes);
         }));
@@ -98,7 +98,7 @@ public class MealLogFragment extends Fragment {
         // Frecuentes
         binding.rvFavorites.setLayoutManager(
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        nutritionRepository.getFavoriteFoods(favorites -> requireActivity().runOnUiThread(() -> {
+        nutritionRepository.getFavoriteFoodsByMealSlot(mealSlot, favorites -> requireActivity().runOnUiThread(() -> {
             if (binding == null) return;
             FavoriteFoodAdapter favAdapter = new FavoriteFoodAdapter(favorites, this::quickAddFavorite);
             binding.rvFavorites.setAdapter(favAdapter);

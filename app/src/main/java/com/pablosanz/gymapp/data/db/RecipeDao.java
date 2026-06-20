@@ -29,6 +29,12 @@ public interface RecipeDao {
     @Query("SELECT * FROM recipes WHERE category = :category ORDER BY name ASC")
     List<Recipe> getByCategory(String category);
 
+    @Query("SELECT * FROM recipes WHERE mealSlot = :mealSlot ORDER BY name ASC")
+    List<Recipe> getByMealSlot(String mealSlot);
+
+    @Query("SELECT * FROM recipes WHERE mealSlot = :mealSlot AND name LIKE '%' || :query || '%' ORDER BY name ASC")
+    List<Recipe> searchByMealSlot(String mealSlot, String query);
+
     @Query("SELECT * FROM recipes WHERE id = :id LIMIT 1")
     Recipe getById(long id);
 }

@@ -12,11 +12,18 @@ public class ShoppingListItem {
     private String ingredientName;
     private float totalQuantityG;
     private boolean purchased;
+    /** Costo estimado en MXN, editable por el usuario para ajustarlo al precio real. */
+    private float estimatedCostMxn;
 
     public ShoppingListItem(String ingredientName, float totalQuantityG, boolean purchased) {
+        this(ingredientName, totalQuantityG, purchased, 0f);
+    }
+
+    public ShoppingListItem(String ingredientName, float totalQuantityG, boolean purchased, float estimatedCostMxn) {
         this.ingredientName = ingredientName;
         this.totalQuantityG = totalQuantityG;
         this.purchased = purchased;
+        this.estimatedCostMxn = estimatedCostMxn;
     }
 
     public long getId() { return id; }
@@ -27,4 +34,6 @@ public class ShoppingListItem {
     public void setTotalQuantityG(float totalQuantityG) { this.totalQuantityG = totalQuantityG; }
     public boolean isPurchased() { return purchased; }
     public void setPurchased(boolean purchased) { this.purchased = purchased; }
+    public float getEstimatedCostMxn() { return estimatedCostMxn; }
+    public void setEstimatedCostMxn(float estimatedCostMxn) { this.estimatedCostMxn = estimatedCostMxn; }
 }

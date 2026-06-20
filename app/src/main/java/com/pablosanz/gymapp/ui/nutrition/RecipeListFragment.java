@@ -70,7 +70,7 @@ public class RecipeListFragment extends Fragment {
     }
 
     private void loadRecipes(String query) {
-        nutritionRepository.searchRecipes(query, recipes ->
+        nutritionRepository.searchRecipesByMealSlot(mealSlot, query, recipes ->
                 requireActivity().runOnUiThread(() -> recipeAdapter.setItems(recipes)));
     }
 

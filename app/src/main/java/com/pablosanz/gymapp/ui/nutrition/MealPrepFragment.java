@@ -17,11 +17,14 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.pablosanz.gymapp.data.model.FavoriteFood;
 import com.pablosanz.gymapp.data.model.MealPlanEntry;
 import com.pablosanz.gymapp.data.model.Recipe;
 import com.pablosanz.gymapp.data.model.ShoppingListItem;
 import com.pablosanz.gymapp.data.repository.NutritionRepository;
+import com.pablosanz.gymapp.databinding.DialogMealSlotPickerBinding;
 import com.pablosanz.gymapp.databinding.FragmentMealPrepBinding;
+import androidx.recyclerview.widget.GridLayoutManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,11 +65,34 @@ public class MealPrepFragment extends Fragment {
 
         binding.btnGenerateShoppingList.setOnClickListener(v -> generatePlan());
 
+        binding.btnClearWeek.setOnClickListener(v -> confirmClearWeek());
+        binding.btnConfirmWeek.setOnClickListener(v -> {
+            generatePlan();
+            Toast.makeText(getContext(), "Semana confirmada", Toast.LENGTH_SHORT).show();
+        });
+
         nutritionRepository.getAllRecipes(recipes -> requireActivity().runOnUiThread(() -> {
             if (binding == null) return;
             allRecipes = recipes;
             loadPlanAndBuildGrid();
         }));
+    }
+
+    private void confirmClearWeek() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Limpiar toda la semana")
+                .setMessage("Esto borrará todas las asignaciones del calendario, el orden de preparación y la lista de compras. ¿Continuar?")
+                .setPositiveButton("Limpiar", (d, w) -> nutritionRepository.clearWeekPlan(() ->
+                        requireActivity().runOnUiThread(() -> {
+                            if (binding == null) return;
+                            planMap.clear();
+                            buildGrid();
+                            binding.cardPrepOrder.setVisibility(View.GONE);
+                            binding.cardShoppingList.setVisibility(View.GONE);
+                            Toast.makeText(getContext(), "Semana limpiada", Toast.LENGTH_SHORT).show();
+                        })))
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 
     private void loadPlanAndBuildGrid() {
@@ -151,7 +177,7 @@ public class MealPrepFragment extends Fragment {
     }
 
     private void updateCellAppearance(TextView cell, MealPlanEntry existing, boolean highlighted) {
-        cell.setText(existing != null ? shortenRecipeName(existing.getRecipeName()) : "+");
+        cell.setText(existing != null ? shortenRecipeName(existing.getDisplayName()) : "+");
         cell.setTextColor(existing != null ? Color.WHITE : Color.parseColor("#9CA3AF"));
         cell.setTypeface(null, existing != null ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
 
@@ -195,34 +221,80 @@ public class MealPrepFragment extends Fragment {
 
         Runnable applyToB = () -> {
             if (a != null) {
-                nutritionRepository.setMealPlan(dayB, slotB, a.getRecipeId(), a.getRecipeName(),
-                        () -> requireActivity().runOnUiThread(this::loadPlanAndBuildGrid));
+                assignEntryToCell(dayB, slotB, a, () -> requireActivity().runOnUiThread(() -> {
+                    loadPlanAndBuildGrid();
+                    generatePlan();
+                }));
             } else {
                 nutritionRepository.clearMealPlanSlot(dayB, slotB,
-                        () -> requireActivity().runOnUiThread(this::loadPlanAndBuildGrid));
+                        () -> requireActivity().runOnUiThread(() -> {
+                            loadPlanAndBuildGrid();
+                            generatePlan();
+                        }));
             }
         };
 
         if (b != null) {
-            nutritionRepository.setMealPlan(dayA, slotA, b.getRecipeId(), b.getRecipeName(), applyToB::run);
+            assignEntryToCell(dayA, slotA, b, applyToB::run);
         } else {
             nutritionRepository.clearMealPlanSlot(dayA, slotA, applyToB::run);
         }
     }
 
-    private void showRecipePicker(String day, String slot) {
-        String[] names = new String[allRecipes.size()];
-        for (int i = 0; i < allRecipes.size(); i++) names[i] = allRecipes.get(i).getName();
+    private void assignEntryToCell(String day, String slot, MealPlanEntry source, Runnable onDone) {
+        if (source.getFavoriteFoodId() > 0) {
+            nutritionRepository.setMealPlanFavorite(day, slot, source.getFavoriteFoodId(), source.getFavoriteFoodName(), onDone);
+        } else {
+            nutritionRepository.setMealPlan(day, slot, source.getRecipeId(), source.getRecipeName(), onDone);
+        }
+    }
 
-        new AlertDialog.Builder(requireContext())
+    private void showRecipePicker(String day, String slot) {
+        DialogMealSlotPickerBinding pickerBinding = DialogMealSlotPickerBinding.inflate(getLayoutInflater());
+
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setTitle("Asignar " + slotLabel(slot) + " — " + day)
-                .setItems(names, (d, index) -> {
-                    Recipe selected = allRecipes.get(index);
-                    applyRecipeToDay(day, slot, selected);
-                    offerApplyToOtherDays(day, slot, selected);
-                })
+                .setView(pickerBinding.getRoot())
                 .setNegativeButton("Cancelar", null)
-                .show();
+                .create();
+
+        pickerBinding.rvPickerFavorites.setLayoutManager(
+                new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+        pickerBinding.rvPickerRecipes.setLayoutManager(new GridLayoutManager(requireContext(), 2));
+
+        nutritionRepository.getFavoriteFoodsByMealSlot(slot, favorites -> requireActivity().runOnUiThread(() -> {
+            if (binding == null) return;
+            pickerBinding.tvPickerFavoritesLabel.setVisibility(favorites.isEmpty() ? View.GONE : View.VISIBLE);
+            FavoriteFoodAdapter favAdapter = new FavoriteFoodAdapter(favorites, fav -> {
+                dialog.dismiss();
+                applyFavoriteToDay(day, slot, fav);
+            });
+            pickerBinding.rvPickerFavorites.setAdapter(favAdapter);
+        }));
+
+        nutritionRepository.getRecipesByMealSlot(slot, recipes -> requireActivity().runOnUiThread(() -> {
+            if (binding == null) return;
+            pickerBinding.tvPickerRecipesLabel.setVisibility(recipes.isEmpty() ? View.GONE : View.VISIBLE);
+            RecipeGridAdapter recipeAdapter = new RecipeGridAdapter(recipe -> {
+                dialog.dismiss();
+                applyRecipeToDay(day, slot, recipe);
+                offerApplyToOtherDays(day, slot, recipe);
+            });
+            recipeAdapter.setItems(recipes);
+            pickerBinding.rvPickerRecipes.setAdapter(recipeAdapter);
+        }));
+
+        dialog.show();
+    }
+
+    private void applyFavoriteToDay(String day, String slot, FavoriteFood fav) {
+        nutritionRepository.setMealPlanFavorite(day, slot, fav.getId(), fav.getName(), () ->
+                requireActivity().runOnUiThread(() -> {
+                    if (binding == null) return;
+                    planMap.put(day + "_" + slot, MealPlanEntry.forFavorite(day, slot, fav.getId(), fav.getName()));
+                    buildGrid();
+                    generatePlan();
+                }));
     }
 
     private String slotLabel(String slot) {
@@ -236,6 +308,7 @@ public class MealPrepFragment extends Fragment {
                     if (binding == null) return;
                     planMap.put(day + "_" + slot, new MealPlanEntry(day, slot, recipe.getId(), recipe.getName()));
                     buildGrid();
+                    generatePlan();
                 }));
     }
 
@@ -275,11 +348,20 @@ public class MealPrepFragment extends Fragment {
         } else {
             Map<Long, Recipe> uniqueRecipes = new java.util.LinkedHashMap<>();
             for (MealPlanEntry e : plan) {
-                if (uniqueRecipes.containsKey(e.getRecipeId())) continue;
+                if (e.getRecipeId() <= 0 || uniqueRecipes.containsKey(e.getRecipeId())) continue;
                 Recipe r = findRecipeById(e.getRecipeId());
                 if (r != null) uniqueRecipes.put(e.getRecipeId(), r);
             }
             List<Recipe> ordered = new ArrayList<>(uniqueRecipes.values());
+
+            if (ordered.isEmpty()) {
+                TextView empty = new TextView(requireContext());
+                empty.setText("No hay recetas que preparar (solo alimentos sueltos asignados).");
+                empty.setTextColor(Color.parseColor("#6C6C70"));
+                binding.layoutPrepOrder.addView(empty);
+                binding.cardPrepOrder.setVisibility(View.VISIBLE);
+                return;
+            }
             ordered.sort((a, b) -> Integer.compare(cookPriority(a.getName()), cookPriority(b.getName())));
 
             int step = 1;

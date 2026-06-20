@@ -17,6 +17,8 @@ public class Recipe {
     private float totalCaloriesKcal;
     private float totalFatG;
     private String prepSteps;
+    /** "desayuno" | "almuerzo" | "merienda" | "cena" — usado para filtrar por horario en el calendario y el plan de comidas. */
+    private String mealSlot;
 
     public Recipe(String name, String category, String description, String imageEmoji,
                   float totalProteinG, float totalCarbsG,
@@ -51,4 +53,6 @@ public class Recipe {
     public void setTotalFatG(float v) { this.totalFatG = v; }
     public String getPrepSteps() { return prepSteps; }
     public void setPrepSteps(String prepSteps) { this.prepSteps = prepSteps; }
+    public String getMealSlot() { return mealSlot; }
+    public void setMealSlot(String mealSlot) { this.mealSlot = mealSlot; }
 }

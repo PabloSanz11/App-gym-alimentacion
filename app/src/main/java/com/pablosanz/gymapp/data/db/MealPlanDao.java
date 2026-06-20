@@ -26,4 +26,7 @@ public interface MealPlanDao {
 
     @Query("DELETE FROM meal_plan_entries WHERE dayOfWeek = :day AND mealSlot = :slot")
     void clearSlot(String day, String slot);
+
+    @Query("DELETE FROM meal_plan_entries")
+    void clearAll();
 }

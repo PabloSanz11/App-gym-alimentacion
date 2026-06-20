@@ -81,6 +81,12 @@ public class ShoppingFragment extends Fragment {
         binding.tvShoppingProgress.setText(checked + " / " + items.size() + " comprados");
         int pct = items.isEmpty() ? 0 : (checked * 100 / items.size());
         binding.progressShopping.setProgress(pct);
+
+        float totalCost = 0f;
+        for (ShoppingListItem item : items) {
+            totalCost += item.getEstimatedCostMxn();
+        }
+        binding.tvShoppingTotalCost.setText(String.format("$%.0f", totalCost));
     }
 
     private void resetAll() {
