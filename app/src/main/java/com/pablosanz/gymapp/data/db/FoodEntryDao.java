@@ -25,6 +25,9 @@ public interface FoodEntryDao {
     @Query("SELECT * FROM food_entries WHERE mealLogId = :mealLogId")
     List<FoodEntry> getByMealLogId(long mealLogId);
 
+    @Query("SELECT * FROM food_entries WHERE id = :id")
+    FoodEntry getById(long id);
+
     @Query("DELETE FROM food_entries WHERE mealLogId = :mealLogId")
     void deleteByMealLogId(long mealLogId);
 }

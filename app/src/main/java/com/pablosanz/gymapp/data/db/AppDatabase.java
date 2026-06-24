@@ -6,12 +6,14 @@ import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.pablosanz.gymapp.data.model.BodyMeasurement;
 import com.pablosanz.gymapp.data.model.ExerciseLog;
 import com.pablosanz.gymapp.data.model.FavoriteFood;
 import com.pablosanz.gymapp.data.model.FoodEntry;
+import com.pablosanz.gymapp.data.model.FoodEntryIngredient;
 import com.pablosanz.gymapp.data.model.IngredientPriceInfo;
 import com.pablosanz.gymapp.data.model.MealLog;
 import com.pablosanz.gymapp.data.model.MealPlanEntry;
@@ -34,8 +36,9 @@ import java.util.concurrent.Executors;
         RecipeIngredient.class,
         MealPlanEntry.class,
         ShoppingListItem.class,
-        IngredientPriceInfo.class
-}, version = 13, exportSchema = false)
+        IngredientPriceInfo.class,
+        FoodEntryIngredient.class
+}, version = 14, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract WorkoutSessionDao workoutSessionDao();
@@ -49,6 +52,27 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract MealPlanDao mealPlanDao();
     public abstract ShoppingListDao shoppingListDao();
     public abstract IngredientPriceInfoDao ingredientPriceInfoDao();
+    public abstract FoodEntryIngredientDao foodEntryIngredientDao();
+
+    // Migración aditiva — agrega la tabla food_entry_ingredients SIN tocar ninguna
+    // tabla existente, para no perder los datos de gym/nutrición ya guardados por el usuario.
+    static final Migration MIGRATION_13_14 = new Migration(13, 14) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `food_entry_ingredients` (" +
+                    "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`foodEntryId` INTEGER NOT NULL, " +
+                    "`ingredientName` TEXT, " +
+                    "`quantityG` REAL NOT NULL, " +
+                    "`proteinG` REAL NOT NULL, " +
+                    "`carbsG` REAL NOT NULL, " +
+                    "`caloriesKcal` REAL NOT NULL, " +
+                    "`fatG` REAL NOT NULL, " +
+                    "FOREIGN KEY(`foodEntryId`) REFERENCES `food_entries`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_food_entry_ingredients_foodEntryId` " +
+                    "ON `food_entry_ingredients` (`foodEntryId`)");
+        }
+    };
 
     public static final ExecutorService databaseWriteExecutor =
             Executors.newFixedThreadPool(4);
@@ -63,6 +87,7 @@ public abstract class AppDatabase extends RoomDatabase {
                                     context.getApplicationContext(),
                                     AppDatabase.class,
                                     "gymapp_database")
+                            .addMigrations(MIGRATION_13_14)
                             .fallbackToDestructiveMigration()
                             .addCallback(sRoomDatabaseCallback)
                             .build();

@@ -21,6 +21,7 @@ import com.pablosanz.gymapp.data.api.FoodProduct;
 import com.pablosanz.gymapp.data.api.FoodSearchResponse;
 import com.pablosanz.gymapp.data.model.FavoriteFood;
 import com.pablosanz.gymapp.data.model.FoodEntry;
+import com.pablosanz.gymapp.data.model.FoodEntryIngredient;
 import com.pablosanz.gymapp.data.model.MealLog;
 import com.pablosanz.gymapp.data.model.MealPlanEntry;
 import com.pablosanz.gymapp.data.model.RecipeIngredient;
@@ -203,7 +204,17 @@ public class MealLogFragment extends Fragment {
                 FoodEntry foodEntry = new FoodEntry(
                         mealLog.getId(), entry.getRecipeName(), "",
                         protein, carbs, calories, fat, 0);
-                nutritionRepository.insertFoodEntry(foodEntry);
+                foodEntry.setRecipeId(entry.getRecipeId());
+                nutritionRepository.insertFoodEntry(foodEntry, entryId -> {
+                    List<FoodEntryIngredient> snapshot = new ArrayList<>();
+                    for (RecipeIngredient ing : ingredients) {
+                        snapshot.add(new FoodEntryIngredient(entryId, ing.getIngredientName(),
+                                ing.getQuantityG() / servings, ing.getProteinG() / servings,
+                                ing.getCarbsG() / servings, ing.getCaloriesKcal() / servings,
+                                ing.getFatG() / servings));
+                    }
+                    nutritionRepository.insertFoodEntryIngredients(snapshot, null);
+                });
                 mealLog.setTotalProteinG(mealLog.getTotalProteinG() + protein);
                 mealLog.setTotalCarbsG(mealLog.getTotalCarbsG() + carbs);
                 mealLog.setTotalCaloriesKcal(mealLog.getTotalCaloriesKcal() + calories);

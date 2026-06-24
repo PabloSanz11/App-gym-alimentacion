@@ -9,6 +9,7 @@ import com.pablosanz.gymapp.data.api.RetrofitClient;
 import com.pablosanz.gymapp.data.db.AppDatabase;
 import com.pablosanz.gymapp.data.db.FavoriteFoodDao;
 import com.pablosanz.gymapp.data.db.FoodEntryDao;
+import com.pablosanz.gymapp.data.db.FoodEntryIngredientDao;
 import com.pablosanz.gymapp.data.db.IngredientPriceInfoDao;
 import com.pablosanz.gymapp.data.db.MealLogDao;
 import com.pablosanz.gymapp.data.db.MealPlanDao;
@@ -17,6 +18,7 @@ import com.pablosanz.gymapp.data.db.RecipeIngredientDao;
 import com.pablosanz.gymapp.data.db.ShoppingListDao;
 import com.pablosanz.gymapp.data.model.FavoriteFood;
 import com.pablosanz.gymapp.data.model.FoodEntry;
+import com.pablosanz.gymapp.data.model.FoodEntryIngredient;
 import com.pablosanz.gymapp.data.model.IngredientPriceInfo;
 import com.pablosanz.gymapp.data.model.MealLog;
 import com.pablosanz.gymapp.data.model.MealPlanEntry;
@@ -43,6 +45,7 @@ public class NutritionRepository {
     private final MealPlanDao mealPlanDao;
     private final ShoppingListDao shoppingListDao;
     private final IngredientPriceInfoDao ingredientPriceInfoDao;
+    private final FoodEntryIngredientDao foodEntryIngredientDao;
 
     public NutritionRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
@@ -54,6 +57,7 @@ public class NutritionRepository {
         mealPlanDao = db.mealPlanDao();
         shoppingListDao = db.shoppingListDao();
         ingredientPriceInfoDao = db.ingredientPriceInfoDao();
+        foodEntryIngredientDao = db.foodEntryIngredientDao();
     }
 
     public LiveData<List<MealLog>> getMealLogsByDate(String date) {
@@ -73,6 +77,80 @@ public class NutritionRepository {
 
     public void insertFoodEntry(FoodEntry entry) {
         AppDatabase.databaseWriteExecutor.execute(() -> foodEntryDao.insert(entry));
+    }
+
+    /** Igual que insertFoodEntry pero entrega el id generado — se usa cuando además
+     *  hay que guardar el snapshot de ingredientes de la receta para ese día. */
+    public void insertFoodEntry(FoodEntry entry, OnInsertCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            long id = foodEntryDao.insert(entry);
+            entry.setId(id);
+            if (callback != null) callback.onInserted(id);
+        });
+    }
+
+    /** Guarda una copia (snapshot) de los ingredientes de la receta para esta entrada de
+     *  comida puntual, de modo que se puedan editar/agregar/quitar sin afectar la receta
+     *  original ni otros días en los que se haya registrado. */
+    public void insertFoodEntryIngredients(List<FoodEntryIngredient> ingredients, Runnable onDone) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            if (!ingredients.isEmpty()) foodEntryIngredientDao.insertAll(ingredients);
+            if (onDone != null) onDone.run();
+        });
+    }
+
+    public void getFoodEntryIngredients(long foodEntryId, OnFoodEntryIngredientsCallback callback) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<FoodEntryIngredient> items = foodEntryIngredientDao.getByFoodEntryId(foodEntryId);
+            if (callback != null) callback.onResult(items);
+        });
+    }
+
+    public void insertFoodEntryIngredient(FoodEntryIngredient ingredient, Runnable onDone) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            foodEntryIngredientDao.insert(ingredient);
+            recalcFoodEntryFromIngredients(ingredient.getFoodEntryId());
+            if (onDone != null) onDone.run();
+        });
+    }
+
+    public void updateFoodEntryIngredient(FoodEntryIngredient ingredient, Runnable onDone) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            foodEntryIngredientDao.update(ingredient);
+            recalcFoodEntryFromIngredients(ingredient.getFoodEntryId());
+            if (onDone != null) onDone.run();
+        });
+    }
+
+    public void deleteFoodEntryIngredient(FoodEntryIngredient ingredient, Runnable onDone) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            foodEntryIngredientDao.delete(ingredient);
+            recalcFoodEntryFromIngredients(ingredient.getFoodEntryId());
+            if (onDone != null) onDone.run();
+        });
+    }
+
+    /** Recalcula los macros totales de un FoodEntry a partir de sus ingredientes
+     *  (snapshot del día) y propaga el cambio al total del MealLog. */
+    private void recalcFoodEntryFromIngredients(long foodEntryId) {
+        FoodEntry entry = foodEntryDao.getById(foodEntryId);
+        if (entry == null) return;
+        List<FoodEntryIngredient> ingredients = foodEntryIngredientDao.getByFoodEntryId(foodEntryId);
+        float qty = 0, p = 0, c = 0, cal = 0, f = 0;
+        for (FoodEntryIngredient ing : ingredients) {
+            qty += ing.getQuantityG();
+            p += ing.getProteinG();
+            c += ing.getCarbsG();
+            cal += ing.getCaloriesKcal();
+            f += ing.getFatG();
+        }
+        entry.setQuantityG(qty);
+        entry.setProteinG(p);
+        entry.setCarbsG(c);
+        entry.setCaloriesKcal(cal);
+        entry.setFatG(f);
+        foodEntryDao.update(entry);
+        recalcMealLogTotals(entry.getMealLogId());
     }
 
     public void getOrCreateMealLog(String date, String mealSlot, OnMealLogCallback callback) {
@@ -440,5 +518,9 @@ public class NutritionRepository {
 
     public interface OnEntriesCallback {
         void onResult(List<FoodEntry> entries);
+    }
+
+    public interface OnFoodEntryIngredientsCallback {
+        void onResult(List<FoodEntryIngredient> ingredients);
     }
 }

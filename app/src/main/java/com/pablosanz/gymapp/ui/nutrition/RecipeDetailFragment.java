@@ -24,6 +24,7 @@ import com.pablosanz.gymapp.R;
 import com.pablosanz.gymapp.data.api.FoodProduct;
 import com.pablosanz.gymapp.data.api.FoodSearchResponse;
 import com.pablosanz.gymapp.data.model.FoodEntry;
+import com.pablosanz.gymapp.data.model.FoodEntryIngredient;
 import com.pablosanz.gymapp.data.model.Recipe;
 import com.pablosanz.gymapp.data.model.RecipeIngredient;
 import com.pablosanz.gymapp.data.repository.NutritionRepository;
@@ -291,7 +292,16 @@ public class RecipeDetailFragment extends Fragment {
                     mealLog.getId(), name, "",
                     protein, carbs, cals, fat, qtyG);
             entry.setRecipeId(recipeId);
-            nutritionRepository.insertFoodEntry(entry);
+            nutritionRepository.insertFoodEntry(entry, entryId -> {
+                List<FoodEntryIngredient> snapshot = new ArrayList<>();
+                for (RecipeIngredient ing : editableIngredients) {
+                    snapshot.add(new FoodEntryIngredient(entryId, ing.getIngredientName(),
+                            ing.getQuantityG() / servings, ing.getProteinG() / servings,
+                            ing.getCarbsG() / servings, ing.getCaloriesKcal() / servings,
+                            ing.getFatG() / servings));
+                }
+                nutritionRepository.insertFoodEntryIngredients(snapshot, null);
+            });
             mealLog.setTotalProteinG(mealLog.getTotalProteinG() + protein);
             mealLog.setTotalCarbsG(mealLog.getTotalCarbsG() + carbs);
             mealLog.setTotalCaloriesKcal(mealLog.getTotalCaloriesKcal() + cals);

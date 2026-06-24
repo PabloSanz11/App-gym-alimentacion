@@ -20,15 +20,23 @@ public class FoodEntryAdapter extends RecyclerView.Adapter<FoodEntryAdapter.View
 
     public interface OnDeleteListener { void onDelete(FoodEntry entry); }
     public interface OnEditListener { void onEdit(FoodEntry entry, float newQty); }
+    public interface OnEditIngredientsListener { void onEditIngredients(FoodEntry entry); }
 
     private final List<FoodEntry> items;
     private final OnDeleteListener onDelete;
     private final OnEditListener onEdit;
+    private OnEditIngredientsListener onEditIngredients;
 
     public FoodEntryAdapter(List<FoodEntry> items, OnDeleteListener onDelete, OnEditListener onEdit) {
         this.items = items;
         this.onDelete = onDelete;
         this.onEdit = onEdit;
+    }
+
+    /** Para entradas que vienen de una receta, el ícono de lápiz abre el editor de
+     *  ingredientes (agregar/quitar) en vez del simple cambio de cantidad. */
+    public void setOnEditIngredientsListener(OnEditIngredientsListener listener) {
+        this.onEditIngredients = listener;
     }
 
     @NonNull
@@ -47,7 +55,13 @@ public class FoodEntryAdapter extends RecyclerView.Adapter<FoodEntryAdapter.View
                 entry.getQuantityG(), entry.getCaloriesKcal(),
                 entry.getProteinG(), entry.getCarbsG(), entry.getFatG()));
 
-        h.btnEdit.setOnClickListener(v -> showEditDialog(v, entry));
+        h.btnEdit.setOnClickListener(v -> {
+            if (entry.getRecipeId() > 0 && onEditIngredients != null) {
+                onEditIngredients.onEditIngredients(entry);
+            } else {
+                showEditDialog(v, entry);
+            }
+        });
         h.btnDelete.setOnClickListener(v -> {
             new AlertDialog.Builder(v.getContext())
                     .setTitle("Eliminar alimento")
