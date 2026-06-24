@@ -110,6 +110,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_other_recipes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🍽 Otras recetas"
+                android:textSize="13sp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                app:strokeColor="@color/colorPrimary"
+                android:textColor="@color/colorPrimary"
                 android:layout_marginBottom="12dp" />
 
             <!-- ── Frecuentes ─────────────────────────────────── -->

@@ -21,13 +21,23 @@ public class EditableIngredientAdapter extends RecyclerView.Adapter<EditableIngr
 
     public interface OnChangeListener { void onChange(); }
 
+    public interface OnPersistListener {
+        void onIngredientEdited(RecipeIngredient ingredient);
+        void onIngredientDeleted(RecipeIngredient ingredient);
+    }
+
     private final List<RecipeIngredient> items;
     private final OnChangeListener listener;
+    private OnPersistListener persistListener;
     private int servings = 1;
 
     public EditableIngredientAdapter(List<RecipeIngredient> items, OnChangeListener listener) {
         this.items = items;
         this.listener = listener;
+    }
+
+    public void setOnPersistListener(OnPersistListener persistListener) {
+        this.persistListener = persistListener;
     }
 
     /** Las cantidades de los ingredientes se guardan por el batch completo; se dividen
@@ -110,12 +120,22 @@ public class EditableIngredientAdapter extends RecyclerView.Adapter<EditableIngr
         holder.etName.addTextChangedListener(holder.nameWatcher);
         holder.etQty.addTextChangedListener(holder.qtyWatcher);
 
+        View.OnFocusChangeListener persistOnBlur = (v, hasFocus) -> {
+            if (hasFocus) return;
+            int pos = holder.getAdapterPosition();
+            if (pos == RecyclerView.NO_ID) return;
+            if (persistListener != null) persistListener.onIngredientEdited(items.get(pos));
+        };
+        holder.etName.setOnFocusChangeListener(persistOnBlur);
+        holder.etQty.setOnFocusChangeListener(persistOnBlur);
+
         holder.btnDelete.setOnClickListener(v -> {
             int pos = holder.getAdapterPosition();
             if (pos != RecyclerView.NO_ID) {
-                items.remove(pos);
+                RecipeIngredient removed = items.remove(pos);
                 notifyItemRemoved(pos);
                 listener.onChange();
+                if (persistListener != null) persistListener.onIngredientDeleted(removed);
             }
         });
     }

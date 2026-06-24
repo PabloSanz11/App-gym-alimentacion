@@ -95,6 +95,8 @@ public class MealLogFragment extends Fragment {
             recipeGridAdapter.setItems(recipes);
         }));
 
+        binding.btnOtherRecipes.setOnClickListener(v -> showAllRecipesDialog());
+
         // Frecuentes
         binding.rvFavorites.setLayoutManager(
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -127,6 +129,35 @@ public class MealLogFragment extends Fragment {
         binding.btnSaveFoodEntry.setOnClickListener(v -> saveFoodEntry());
 
         loadWeeklyPreselection();
+    }
+
+    private void showAllRecipesDialog() {
+        View dialogView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.dialog_all_recipes, null);
+        androidx.recyclerview.widget.RecyclerView rvAllRecipes = dialogView.findViewById(R.id.rv_all_recipes);
+
+        android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(requireContext())
+                .setTitle("Otras recetas")
+                .setView(dialogView)
+                .setNegativeButton("Cerrar", null)
+                .create();
+
+        AllRecipesAdapter adapter = new AllRecipesAdapter(recipe -> {
+            dialog.dismiss();
+            Bundle args = new Bundle();
+            args.putLong("recipeId", recipe.getId());
+            args.putString("recipeName", recipe.getName());
+            args.putString("mealSlot", mealSlot);
+            args.putString("date", date);
+            Navigation.findNavController(requireView())
+                    .navigate(R.id.action_mealLogFragment_to_recipeDetailFragment, args);
+        });
+        rvAllRecipes.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvAllRecipes.setAdapter(adapter);
+
+        nutritionRepository.getAllRecipes(recipes -> requireActivity().runOnUiThread(() -> adapter.setItems(recipes)));
+
+        dialog.show();
     }
 
     private void loadWeeklyPreselection() {

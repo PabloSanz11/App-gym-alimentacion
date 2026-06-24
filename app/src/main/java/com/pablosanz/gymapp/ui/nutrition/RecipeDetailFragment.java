@@ -70,6 +70,17 @@ public class RecipeDetailFragment extends Fragment {
                 Navigation.findNavController(v).popBackStack());
 
         ingredientAdapter = new EditableIngredientAdapter(editableIngredients, this::onIngredientChanged);
+        ingredientAdapter.setOnPersistListener(new EditableIngredientAdapter.OnPersistListener() {
+            @Override
+            public void onIngredientEdited(RecipeIngredient ingredient) {
+                nutritionRepository.updateRecipeIngredient(ingredient, () -> recalcRecipeTotals());
+            }
+
+            @Override
+            public void onIngredientDeleted(RecipeIngredient ingredient) {
+                nutritionRepository.deleteRecipeIngredient(ingredient, () -> recalcRecipeTotals());
+            }
+        });
         binding.rvIngredients.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvIngredients.setAdapter(ingredientAdapter);
 
@@ -153,7 +164,10 @@ public class RecipeDetailFragment extends Fragment {
                         }
                         @Override
                         public void onError(String error) {
-                            requireActivity().runOnUiThread(() -> progress.setVisibility(View.GONE));
+                            requireActivity().runOnUiThread(() -> {
+                                progress.setVisibility(View.GONE);
+                                Toast.makeText(getContext(), "Error al buscar: " + error, Toast.LENGTH_SHORT).show();
+                            });
                         }
                     });
                 };
@@ -162,6 +176,13 @@ public class RecipeDetailFragment extends Fragment {
         });
 
         dialog.show();
+        // El EditText dentro del AlertDialog no recibe foco/teclado automáticamente en
+        // algunos dispositivos; se solicita explícitamente para que la búsqueda funcione
+        // al primer intento sin tener que tocar el campo dos veces.
+        etSearch.requestFocus();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        }
     }
 
     private java.util.List<FoodProduct> filterUsableProducts(java.util.List<FoodProduct> products) {
@@ -236,22 +257,27 @@ public class RecipeDetailFragment extends Fragment {
     }
 
     private void persistIngredientAndRecipeTotals(RecipeIngredient ingredient) {
-        nutritionRepository.insertRecipeIngredient(ingredient, () -> {
-            if (recipe == null) return;
-            float protein = 0, carbs = 0, cals = 0, fat = 0;
-            for (RecipeIngredient ing : editableIngredients) {
-                protein += ing.getProteinG();
-                carbs += ing.getCarbsG();
-                cals += ing.getCaloriesKcal();
-                fat += ing.getFatG();
-            }
-            int servings = Math.max(1, recipe.getServings());
-            recipe.setTotalProteinG(protein / servings);
-            recipe.setTotalCarbsG(carbs / servings);
-            recipe.setTotalCaloriesKcal(cals / servings);
-            recipe.setTotalFatG(fat / servings);
-            nutritionRepository.updateRecipe(recipe);
-        });
+        nutritionRepository.insertRecipeIngredient(ingredient, this::recalcRecipeTotals);
+    }
+
+    /** Recalcula los totales de la receta (proteína/carbs/calorías/grasa por porción) a
+     * partir de la lista actual de ingredientes y los persiste — se usa después de
+     * agregar, editar o eliminar un ingrediente para que los cambios no se pierdan. */
+    private void recalcRecipeTotals() {
+        if (recipe == null) return;
+        float protein = 0, carbs = 0, cals = 0, fat = 0;
+        for (RecipeIngredient ing : new ArrayList<>(editableIngredients)) {
+            protein += ing.getProteinG();
+            carbs += ing.getCarbsG();
+            cals += ing.getCaloriesKcal();
+            fat += ing.getFatG();
+        }
+        int servings = Math.max(1, recipe.getServings());
+        recipe.setTotalProteinG(protein / servings);
+        recipe.setTotalCarbsG(carbs / servings);
+        recipe.setTotalCaloriesKcal(cals / servings);
+        recipe.setTotalFatG(fat / servings);
+        nutritionRepository.updateRecipe(recipe);
     }
 
     private void addToMeal(float protein, float carbs, float cals, float fat) {
